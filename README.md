@@ -13,6 +13,7 @@ php-aware was developed by Mikko Koppanen.
 The jam extension overrides Zend's Engine zend_error_cb(), set_error_handler() and restore_error_handler() with a custom function that takes a copy of the current context, sends the error to the backends set in the aware.storage_modules directive and then calls the original error handler(s).
 
 Each backend storage is a separate PHP extension and additional backends can therefore easily be added, see @URL-FOR-ADDING-BE-HERE@ 
+
 The backend will receive a zval * containing information about the current error which it then stores based on it's own configuration. 
 
 It is possible to chain the backends to store the event in multiple backends, i.e: send an email and then log to Elasticsearch, for example.
@@ -34,7 +35,6 @@ long type; // error type, see http://php.net/manual/en/errorfunc.constants.php
 const char *appname; // app identifier string, configured with the aware.appname directive 
 ```
 
-
 	* the backend stores the event as defined in its PHP_JAM_STORE_FUNC()
     * call Zend Engine's original error callback 
 
@@ -44,8 +44,53 @@ const char *appname; // app identifier string, configured with the aware.appname
     - php errors of all levels [i.e http://php.net/manual/en/errorfunc.constants.php] 
     - slow requests
     - peak memory usage during request
-    
 
+# Basic setup    
+
+## Debian/Ubuntu and friends
+
+
+## RHEL/CentOS and friends
+
+
+## Compiling from source
+
+### Compiling the JaM extension
+JaM depends on libuuid, make sure you install the relevant headers and shared objects for it.
+
+On deb based systems:
+```
+# aptitude install uuid-dev
+```
+On RHEL based systems:
+```
+# yum install libuuid-devel
+```
+
+Other Linux and Unices distros should also have it in one format or another.
+
+```
+$ cd /path/to/jam/root/dir
+$ phpize
+$ ./configure
+$ make
+# make install
+```
+
+See "Core INI settings" for the available directives.
+
+By itself JaM will do pretty much nothing for you, next, select the backends you are interested in and cd into their dir under storage, for instance, if you are interested in the elasticsearch backend:
+```
+$ cd storage/elasticsearch
+$ phpize
+$ ./configure
+$ make
+# make install
+```
+
+See "elasticsearch->INI settings" for the relevant directives.
+
+All available backends are under the storage dir, config and build instructions are the same for all.
 
 ## Core INI settings
  
@@ -417,4 +462,20 @@ const char *appname; // app identifier string, configured with the aware.appname
     
     
 ## Creating additional storage backends
-    
+- run: 
+``` 
+./storage/create_backend_ext_skeleton.php <new-backend-ext-name>     
+```
+
+This will create a dir with all needed skeleton files for you.
+
+- In, yourext/jam_yourext.c, implement the needed functions for your backend, minimum is to implement PHP_JAM_STORE_FUNC(yourext), other functions are not mandatory.
+- If your extension has any directives, add them to PHP_INI_BEGIN() and init them in php_jam_yourext_init_globals() 
+- If your extension depends on additional C/C++ libs, edit yourext/config.m4 accordingly.
+- run the standard PHP configuration and build commands, i.e:
+```
+$ phpize
+$ ./configure
+$ make
+# make install
+```

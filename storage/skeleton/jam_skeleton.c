@@ -1,8 +1,6 @@
 /*
    +----------------------------------------------------------------------+
-   | PHP Version 5 / jam                                                |
-   +----------------------------------------------------------------------+
-   | Copyright (c) 2009 Mikko Koppanen                                    |
+   | Copyright (c) Mikko Koppanen 2009, Jess Portnoy 2015 and onwards     |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -12,7 +10,9 @@
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
    +----------------------------------------------------------------------+
-   | Author: Mikko Kopppanen <mkoppanen@php.net>                          |
+   | Authors: 								  |
+   |	Mikko Kopppanen <mkoppanen@php.net>                               |
+   |	Jess Portnoy <jess.portnoy@kaltura.com>                           |
    +----------------------------------------------------------------------+
 */
 
@@ -31,21 +31,25 @@ PHP_JAM_CONNECT_FUNC(skeleton)
 
 PHP_JAM_GET_FUNC(skeleton)
 {
+	/* const char *uuid, zval *event TSRMLS_DC */
 	return AwareOperationNotSupported;
 }
 
 PHP_JAM_STORE_FUNC(skeleton)
-{
+{	
+	/* const char *uuid, zval *event, const char *error_filename, long error_lineno TSRMLS_DC, long type, const char *appname, const char *source_baseurl */
 	return AwareOperationNotSupported;
 }
 
 PHP_JAM_GET_LIST_FUNC(skeleton)
 {
+	/* long start, long limit, zval *events TSRMLS_DC */
 	return AwareOperationNotSupported;
 }
 
 PHP_JAM_DELETE_FUNC(skeleton)
 {
+	/* const char *uuid TSRMLS_DC */
 	return AwareOperationNotSupported;
 }
 
@@ -55,12 +59,12 @@ PHP_JAM_DISCONNECT_FUNC(skeleton)
 }
 
 PHP_INI_BEGIN()
-	STD_PHP_INI_ENTRY("jam_skeleton.foobar", "somevalue", PHP_INI_PERDIR, OnUpdateString, foobar, zend_jam_skeleton_globals, jam_skeleton_globals)
+	STD_PHP_INI_ENTRY("jam_skeleton.directive_name", "somevalue", PHP_INI_PERDIR, OnUpdateString, directive_name, zend_jam_skeleton_globals, jam_skeleton_globals)
 PHP_INI_END()
 
 static void php_jam_skeleton_init_globals(zend_jam_skeleton_globals *jam_skeleton_globals)
 {
-	jam_skeleton_globals->foobar = NULL;	
+	jam_skeleton_globals->directive_name = NULL;	
 }
 
 /* {{{ PHP_MINIT_FUNCTION(jam_skeleton) */

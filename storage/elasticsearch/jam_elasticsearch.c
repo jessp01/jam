@@ -118,13 +118,7 @@ PHP_JAM_GET_FUNC(elasticsearch)
 
 PHP_JAM_STORE_FUNC(elasticsearch)
 {
-    /*const char *uuid; 
-    zval *event; 
-    long type; 
-    const char *error_filename;
-    long error_lineno;*/
-    
-    zval **ppzval;
+    zval **ppzval;					    /* will hold the error message */
     CURL *ch;                                               /* curl handle */
     CURLcode rcode;                                         /* curl result code */
     char hostname[255];

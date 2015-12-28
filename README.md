@@ -8,6 +8,12 @@ CREDIT line: JaM was initially forked from https://github.com/mkoppanen/php-awar
 
 php-aware was developed by Mikko Koppanen.
 
+# What does JaM monitor?
+
+    - PHP errors of all levels [see http://php.net/manual/en/errorfunc.constants.php] 
+    - Slow requests
+    - Peak memory usage during request
+
 # How does it work?
 
 The jam extension overrides Zend's Engine zend_error_cb(), set_error_handler() and restore_error_handler() with a custom function that takes a copy of the current context, sends the error to the backends set in the aware.storage_modules directive and then calls the original error handler(s).
@@ -37,13 +43,6 @@ const char *appname; // app identifier string, configured with the aware.appname
 
 	* the backend stores the event as defined in its PHP_JAM_STORE_FUNC()
     * call Zend Engine's original error callback 
-
-
-# What does JaM monitor?
-
-    - php errors of all levels [i.e http://php.net/manual/en/errorfunc.constants.php] 
-    - slow requests
-    - peak memory usage during request
 
 # Basic setup    
 
@@ -105,7 +104,7 @@ All available backends are under the storage dir, config and build instructions 
  	<tr>
 		<td> jam.enabled </td>
 		<td> boolean </td>
-		<td> Is jam enabled (Default: On) </td>
+		<td> enable JaM (Default: On) </td>
 		<td>PHP_INI_SYSTEM</td>
 	</tr>
 	<tr>
@@ -178,7 +177,7 @@ All available backends are under the storage dir, config and build instructions 
     </tr><tr>    
         <td> jam.storage_modules </td>
 		<td> string </td>
-		<td> Comma separated list of storage backend modules to enabled (i.e aware.storage_modules="elasticsearch,email")</td>
+		<td> Comma separated list of storage backend modules to enable (i.e aware.storage_modules="elasticsearch,email")</td>
 	    <td>PHP_INI_PERDIR</td>
     </tr><tr>
         <td> jam.slow_request_threshold </td>

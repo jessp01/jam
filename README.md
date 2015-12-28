@@ -270,28 +270,8 @@ All available backends are under the storage dir, config and build instructions 
 	</tr>
 </table>
 
-## files
-    Stores the information in files
-    
-### Ini settings
-
-<table>
-	<tr>
-		<td>Name</td>
-		<td>Type</td>
-		<td>Description</td>
-		<td>Mode</td>
-	</tr>
-	<tr>
-		<td> jam_files.storage_path </td>
-		<td> String </td>
-		<td> Path to store the events to </td>
-		<td>PHP_INI_PERDIR</td>
-	</tr>
-</table>
-
 ## snmp
-    Sends an snmp trap
+    Sends the event as an SNMP trap
     
 ### Ini settings
 
@@ -339,6 +319,27 @@ All available backends are under the storage dir, config and build instructions 
 		<td>PHP_INI_PERDIR</td>
 	</tr>		
 </table>
+
+## files
+    Stores the information in files
+    
+### Ini settings
+
+<table>
+	<tr>
+		<td>Name</td>
+		<td>Type</td>
+		<td>Description</td>
+		<td>Mode</td>
+	</tr>
+	<tr>
+		<td> jam_files.storage_path </td>
+		<td> String </td>
+		<td> Path to store the events to </td>
+		<td>PHP_INI_PERDIR</td>
+	</tr>
+</table>
+
     
 ## spread
     Sends the event to a spread network

@@ -18,8 +18,13 @@ if test "$PHP_JAM_SPREAD" != "no"; then
 			if test -r "$i/include/sp.h"; then
 				PHP_JAM_SPREAD_DIR=$i
 				AC_MSG_RESULT(found in $i)
+				break;
 			fi
 		done
+	fi
+
+	if test -z $PHP_JAM_SPREAD_DIR; then
+		AC_MSG_ERROR([spread not found])	
 	fi
 	
 	PHP_ADD_INCLUDE($PHP_JAM_SPREAD_DIR/include)

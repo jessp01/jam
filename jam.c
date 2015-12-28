@@ -500,7 +500,7 @@ static PHP_INI_MH(OnUpdateModuleErrorReporting)
 }
 
 PHP_INI_BEGIN()
-	STD_PHP_INI_ENTRY("jam.enabled",			"1",		PHP_INI_PERDIR, OnUpdateBool, 		enabled,			zend_jam_globals, jam_globals)
+	STD_PHP_INI_ENTRY("jam.enabled",			"1",		PHP_INI_SYSTEM, OnUpdateBool, 		enabled,			zend_jam_globals, jam_globals)
 	STD_PHP_INI_ENTRY("jam.use_cache",        "0",	    PHP_INI_PERDIR, OnUpdateBool,	    use_cache,      	zend_jam_globals, jam_globals)
 		
 	STD_PHP_INI_ENTRY("jam.error_reporting",		"22519",	PHP_INI_PERDIR, OnUpdateLogLevel,	log_level,			zend_jam_globals, jam_globals)

@@ -4,6 +4,10 @@ JaM is a PHP monitoring system that supports storing PHP errors (events) into di
 
 The events can later be retrieved from backends that implement PHP_JAM_GET_FUNC().
 
+CREDIT line: JaM was initially forked from https://github.com/mkoppanen/php-aware which is no longer an active project. 
+
+php-aware was developed by Mikko Koppanen.
+
 # How does it work?
 
 The jam extension overrides Zend's Engine zend_error_cb(), set_error_handler() and restore_error_handler() with a custom function that takes a copy of the current context, sends the error to the backends set in the aware.storage_modules directive and then calls the original error handler(s).
@@ -64,6 +68,115 @@ The basic flow is:
     Returns a list of currently configured storage backend modules.
 
 
+## Core INI settings
+ 
+<table>
+	<tr>
+		<td>Name</td>
+		<td>Type</td>
+		<td>Description</td>
+		<td>Mode</td>
+	</tr>
+ 	<tr>
+		<td> jam.enabled </td>
+		<td> boolean </td>
+		<td> Is jam enabled (Default: On) </td>
+		<td>PHP_INI_SYSTEM</td>
+	</tr>
+	<tr>
+        <td> jam.use_cache </td>
+ 	    <td> boolean </td>
+ 	    <td> Use serialization cache (Default: On) </td>
+	    <td>PHP_INI_PERDIR</td>
+	</tr>
+	<tr>		
+        <td> jam.error_reporting </td>
+		<td> integer </td>
+		<td> Error reporting level (which events are stored) </td>
+	    <td>PHP_INI_PERDIR</td>
+	</tr>
+	<tr>    
+        <td> jam.module_error_reporting </td>
+		<td> string </td>
+		<td> Override error reporting on backend module basis (Format: tokyo=E_ALL,snmp=E_ERROR)</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+        <td> jam.depth </td>
+		<td> integer </td>
+		<td> How many levels to serialize</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>	  
+        <td> jam.log_get </td>
+		<td> boolean </td>
+		<td> Whether to include _GET values in the serialized event</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+        <td> jam.log_post </td>
+		<td> boolean </td>
+		<td> Whether to include _POST values in the serialized event</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+        <td> jam.log_session </td>
+		<td> boolean </td>
+		<td> Whether to include _SESSION values in the serialized event</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+        <td> jam.log_cookie </td>
+		<td> boolean </td>
+		<td> Whether to include _COOKIE values in the serialized event</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+        <td> jam.log_env </td>
+		<td> boolean </td>
+		<td> Whether to include _ENV values in the serialized event</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+        <td> jam.log_server </td>
+		<td> boolean </td>
+		<td> Whether to include _SERVER values in the serialized event</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+        <td> jam.log_files </td>
+		<td> boolean </td>
+		<td> Whether to include _FILES values in the serialized event</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+        <td> jam.log_backtrace </td>
+		<td> boolean </td>
+		<td> Whether to include backtrace in the serialized event</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+        <td> jam.enable_event_trigger </td>
+		<td> boolean </td>
+		<td> Whether to log events generated with jam_event_trigger</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+        <td> jam.storage_modules </td>
+		<td> string </td>
+		<td> List of storage backend modules to enabled (CSV)</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>
+        <td> jam.slow_request_threshold </td>
+		<td> integer </td>
+		<td> Setting > 0 activates slow request monitor (milliseconds)</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+	    <td> jam.memory_usage_threshold </td>
+		<td> integer </td>
+		<td> Setting > 0 activates memory usage monitor (bytes)</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+	    <td> jam.error_page </td>
+		<td> string </td>
+		<td> Error page filename. This page is displayed in case of a fatal error when display_errors is off</td>
+	    <td>PHP_INI_PERDIR</td>
+    </tr><tr>    
+	    <td> jam.appname </td>
+		<td> string </td>
+		<td> report the appname in which the err was triggered </td>
+	    <td>PHP_INI_ALL</td>
+    </tr> 
+</table>
 
 
 # Storage backends 
@@ -94,9 +207,16 @@ The basic flow is:
 
 <table>
 	<tr>
+		<td>Name</td>
+		<td>Type</td>
+		<td>Description</td>
+		<td>Mode</td>
+	</tr>
+	<tr>
 		<td> jam_email.to_address </td>
 		<td> String </td>
-		<td> Email recipient address. For example john.doe@example.com </td>
+		<td> Email recipient address. For example php_errors@example.com </td>
+		<td>PHP_INI_PERDIR</td>
 	</tr>
 </table>
 
@@ -107,9 +227,16 @@ The basic flow is:
 
 <table>
 	<tr>
+		<td>Name</td>
+		<td>Type</td>
+		<td>Description</td>
+		<td>Mode</td>
+	</tr>
+	<tr>
 		<td> jam_files.storage_path </td>
 		<td> String </td>
 		<td> Path to store the events to </td>
+		<td>PHP_INI_PERDIR</td>
 	</tr>
 </table>
 
@@ -120,34 +247,46 @@ The basic flow is:
 
 <table>
 	<tr>
+		<td>Name</td>
+		<td>Type</td>
+		<td>Description</td>
+		<td>Mode</td>
+	</tr>
+	<tr>
 		<td> jam_snmp.trap_host </td>
 		<td> String </td>
 		<td> hostname:port of the snmptrapd </td>
+		<td>PHP_INI_SYSTEM</td>
 	</tr>
 	<tr>
 		<td> jam_snmp.trap_community </td>
 		<td> String </td>
 		<td> snmp community for the trap </td>
+		<td>PHP_INI_PERDIR</td>
 	</tr>
 	<tr>
 		<td> jam_snmp.trap_oid </td>
 		<td> String </td>
 		<td> OID for the trap </td>
+		<td>PHP_INI_PERDIR</td>
 	</tr>
 	<tr>
 		<td> jam_snmp.name_oid </td>
 		<td> String </td>
 		<td> OID for holding the script name </td>
+		<td>PHP_INI_PERDIR</td>
 	</tr>
 	<tr>
 		<td> jam_snmp.error_msg_oid </td>
 		<td> String </td>
 		<td> OID for holding the error message </td>
+		<td>PHP_INI_PERDIR</td>
 	</tr>		
 	<tr>
 		<td> jam_snmp.uuid_oid </td>
 		<td> String </td>
 		<td> OID for holding the uuid </td>
+		<td>PHP_INI_PERDIR</td>
 	</tr>		
 </table>
     
@@ -271,85 +410,6 @@ The basic flow is:
 	</tr>		
 </table>
 
-# Ini settings
-
-## Core settings
- 
-<table>
- 	<tr>
-        <td> jam.enabled </td>
-		<td> boolean </td>
-		<td> Is jam enabled (Default: On) </td>
-    </tr><tr>
-        <td> jam.use_cache </td>
- 	    <td> boolean </td>
- 	    <td> Use serialization cache (Default: On) </td>
-    </tr><tr>		
-        <td> jam.error_reporting </td>
-		<td> integer </td>
-		<td> Error reporting level (which events are stored) </td>
-    </tr><tr>    
-        <td> jam.module_error_reporting </td>
-		<td> string </td>
-		<td> Override error reporting on backend module basis (Format: tokyo=E_ALL,snmp=E_ERROR)</td>
-    </tr><tr>    
-        <td> jam.depth </td>
-		<td> integer </td>
-		<td> How many levels to serialize</td>
-    </tr><tr>	  
-        <td> jam.log_get </td>
-		<td> boolean </td>
-		<td> Whether to include _GET values in the serialized event</td>
-    </tr><tr>    
-        <td> jam.log_post </td>
-		<td> boolean </td>
-		<td> Whether to include _POST values in the serialized event</td>
-    </tr><tr>    
-        <td> jam.log_session </td>
-		<td> boolean </td>
-		<td> Whether to include _SESSION values in the serialized event</td>
-    </tr><tr>    
-        <td> jam.log_cookie </td>
-		<td> boolean </td>
-		<td> Whether to include _COOKIE values in the serialized event</td>
-    </tr><tr>    
-        <td> jam.log_env </td>
-		<td> boolean </td>
-		<td> Whether to include _ENV values in the serialized event</td>
-    </tr><tr>    
-        <td> jam.log_server </td>
-		<td> boolean </td>
-		<td> Whether to include _SERVER values in the serialized event</td>
-    </tr><tr>    
-        <td> jam.log_files </td>
-		<td> boolean </td>
-		<td> Whether to include _FILES values in the serialized event</td>
-    </tr><tr>    
-        <td> jam.log_backtrace </td>
-		<td> boolean </td>
-		<td> Whether to include backtrace in the serialized event</td>
-    </tr><tr>    
-        <td> jam.enable_event_trigger </td>
-		<td> boolean </td>
-		<td> Whether to log events generated with jam_event_trigger</td>
-    </tr><tr>    
-        <td> jam.storage_modules </td>
-		<td> string </td>
-		<td> List of storage backend modules to enabled (CSV)</td>
-    </tr><tr>
-        <td> jam.slow_request_threshold </td>
-		<td> integer </td>
-		<td> Setting > 0 activates slow request monitor (milliseconds)</td>
-    </tr><tr>    
-	    <td> jam.memory_usage_threshold </td>
-		<td> integer </td>
-		<td> Setting > 0 activates memory usage monitor (bytes)</td>
-    </tr><tr>    
-	    <td> jam.error_page </td>
-		<td> string </td>
-		<td> Error page filename. This page is displayed in case of a fatal error when display_errors is off</td>
-    </tr> 
-</table>
     
     
     

@@ -24,6 +24,7 @@ The basic flow is:
   - PHP error happens: 
     -> Zend Engine calls zend_error_cb() which passes the event to our callback
       -> JaM main ext loops through all configured backends and passes the following:
+
 ```
 	const char *uuid; /* uniq ID */
 	zval *event; /* struct containing info about the event */ 
@@ -31,8 +32,7 @@ The basic flow is:
 	long error_lineno; /* line in which the error occured */
 	long type /* error type, see http://php.net/manual/en/errorfunc.constants.php */
 	const char *appname /* app identifier string, configured with the aware.appname directive */
-``` 
-
+```
         -> the backend stores the event as defined in its PHP_JAM_STORE_FUNC()
     -> call Zend Engine's original error callback 
 

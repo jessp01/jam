@@ -32,6 +32,7 @@ The basic flow is:
 	long type /* error type, see http://php.net/manual/en/errorfunc.constants.php */
 	const char *appname /* app identifier string, configured with the aware.appname directive */
 	``` 
+
         -> the backend stores the event as defined in its PHP_JAM_STORE_FUNC()
     -> call Zend Engine's original error callback 
 

@@ -1,0 +1,33 @@
+1. Get the jam sources
+  
+  git clone git://github.com/mkoppanen/php-jam.git 
+  
+2. Run the build script
+
+  # bash build.sh
+    
+  The build script should compile and install the extensions. 
+  Just comment out the backends you dont need
+  
+3. Configure jam, the following entries to PHP ini should get you started:
+
+  -----
+
+  ; Load the jam core extension
+  extension=jam.so
+  
+  ; Load jam tokyo plugin
+  extension=jam_tokyo.so
+  
+  ; Enable tokyo backend
+  jam.storage_modules=tokyo
+  
+  ; Tokyo Cabinet
+  jam_tokyo.backend="cabinet"
+  jam_tokyo.cabinet_file="/tmp/test.tct"
+
+  -----
+
+This assumes you chose to install the tokyo backend for jam. 
+The gui is currently hardcoded to use the tokyo backend so to 
+test drive things it probably makes sense to enable it. 

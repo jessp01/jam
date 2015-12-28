@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package packagerversion="1.4.9" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+ <name>jam</name>
+ <channel>pecl.php.net</channel>
+ <summary>Aware monitoring extension</summary>
+ <description>Monitors the PHP stack</description>
+ <lead>
+  <name>Mikko Koppanen</name>
+  <user>mkoppanen</user>
+  <email>mkoppanen@php.net</email>
+  <active>yes</active>
+ </lead>
+ <date>2009-12-15</date>
+ <time>15:33:53</time>
+ <version>
+  <release>0.1.1</release>
+  <api>0.1.1</api>
+ </version>
+ <stability>
+  <release>beta</release>
+  <api>beta</api>
+ </stability>
+ <license uri="http://www.php.net/license">PHP License</license>
+ <notes>- Initial release</notes>
+ <contents>
+  <dir name="/">
+   <!-- Support files -->
+   <file name="config.m4" role="src" />
+   <file name="jam.spec" role="src">
+    <tasks:replace from="@PACKAGE_VERSION@" to="version" type="package-info" />
+   </file>
+   
+   <!-- Headers -->
+   <file name="php_jam.h" role="src">
+    <tasks:replace from="@PACKAGE_VERSION@" to="version" type="package-info" />
+   </file>
+   <file name="php_jam_storage.h" role="src" />
+   <file name="php_jam_private.h" role="src" />
+   <file name="php_jam_request.h" role="src" />
+   <file name="php_jam_uuid.h" role="src" />
+   <file name="php_jam_cache.h" role="src" />
+   
+   <!-- Source files -->
+   <file name="jam.c" role="src" />
+   <file name="jam_storage.c" role="src" />
+   <file name="jam_request.c" role="src" />
+   <file name="jam_uuid.c" role="src" />
+   <file name="jam_cache.c" role="src" />
+
+   <!-- misc files -->
+   <file name="README.md" role="doc" />
+   <file name="EXAMPLE_CONFIG.txt" role="doc" />
+   <file name="INSTALL.txt" role="doc" />
+   <file name="LICENSE" role="doc" />
+     <dir name="storage">
+	<dir name="email">
+	 <file name="jam_email.c" role="src" />
+	 <file name="config.m4" role="src" />
+	 <file name="php_jam_email.h" role="src" />
+	</dir>
+	<dir name="files">
+	 <file name="jam_files.c" role="src" />
+	 <file name="config.w32" role="src" />
+	 <file name="config.m4" role="src" />
+	 <file name="php_jam_files.h" role="src" />
+	</dir>
+	<dir name="snmp">
+	 <file name="jam_snmp.c" role="src" />
+	 <file name="config.m4" role="src" />
+	 <file name="php_jam_snmp.h" role="src" />
+	</dir>
+	<dir name="spread">
+	 <file name="jam_spread.c" role="src" />
+	 <file name="config.m4" role="src" />
+	 <file name="php_jam_spread.h" role="src" />
+	</dir>
+	<dir name="stomp">
+	 <file name="jam_stomp.c" role="src" />
+	 <file name="config.m4" role="src" />
+	 <file name="config.w32" role="src" />
+	 <file name="php_jam_stomp.h" role="src" />
+	 <file name="jam_stomp_funcs.c" role="src" />
+	 <file name="php_jam_stomp_funcs.h" role="src" />
+	</dir>
+	<dir name="tokyo">
+	 <file name="jam_tokyo.c" role="src" />
+	 <file name="jam_tokyo_cabinet.c" role="src" />
+	 <file name="jam_tokyo_tyrant.c" role="src" />
+	 <file name="php_jam_tokyo.h" role="src" />
+	 <file name="php_jam_tokyo_cabinet.h" role="src" />
+	 <file name="php_jam_tokyo_tyrant.h" role="src" />
+	 <file name="config.m4" role="src" />
+	</dir>
+	<dir name="zeromq2">
+	 <file name="jam_zeromq2.c" role="src" />
+	 <file name="php_jam_zeromq2.h" role="src" />
+	 <file name="config.m4" role="src" />
+	</dir>
+     </dir>
+  </dir>
+ </contents>
+ <dependencies>
+  <required>
+   <php>
+    <min>5.2.0</min>
+   </php>
+   <pearinstaller>
+    <min>1.4.0</min>
+   </pearinstaller>
+  </required>
+ </dependencies>
+ <providesextension>jam</providesextension>
+ <extsrcrelease />
+</package>

@@ -1,0 +1,43 @@
+; Load the jam core extension
+extension=jam.so
+
+; Load jam files plugin
+extension=jam_files.so
+
+; Load jam snmp plugin
+extension=jam_snmp.so
+
+; Load jam tokyo plugin
+extension=jam_tokyo.so
+
+; Configure where the events will be send to
+; The events are sent to all configured backends in this order 
+jam.storage_modules="files,snmp,tokyo"
+
+; Add snmp configuration
+jam_snmp.trap_host="localhost:162"
+jam_snmp.trap_community="public"
+
+; Contains the trap oid
+jam_snmp.trap_oid="1.3.6.1.4.1.NNNN.1"
+
+; Contains the name of the script
+jam_snmp.name_oid="1.3.6.1.4.1.NNNN.2"
+
+; Contains the error message string
+jam_snmp.error_msg_oid="1.3.6.1.4.1.NNNN.3"
+
+; Contains the uuid string
+jam_snmp.uuid_oid="1.3.6.1.4.1.NNNN.4"
+
+; Tokyo Cabinet
+jam_tokyo.backend="cabinet"
+jam_tokyo.cabinet_file="/tmp/test.tct"
+
+; Override email reporting to only send on certain errors
+jam.module_error_reporting='email=E_ERROR|E_WARNING'
+
+
+Running tests 
+
+export TEST_PHP_ARGS='-n -djam.enabled=1' && make test

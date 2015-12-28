@@ -1,8 +1,6 @@
 /*
    +----------------------------------------------------------------------+
-   | PHP Version 5 / jam                                                |
-   +----------------------------------------------------------------------+
-   | Copyright (c) Mikko Koppanen, Jess Portnoy                           |
+   | Copyright (c) Mikko Koppanen 2009, Jess Portnoy 2015 and onwards     |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |

@@ -1,68 +1,67 @@
-# What is jam?
+# What is JaM?
 
-jam is a PHP monitoring system that supports storing PHP errors (events) into different storage backends. 
+JaM is a PHP monitoring system that supports storing PHP errors (events) into different storage backends. 
 The events can be later retrieved from backends that support retrieval.
 
 # How does it work?
 
-Roughly: override zend_error_cb, set_error_handler and restore_error_handler with a custom function that takes 
-a copy of the current context, sends error to the configured backends and invokes original error handler(s).
+The jam extension overrides Zend's Engine zend_error_cb(), set_error_handler() and restore_error_handler() with a custom function that takes a copy of the current context, sends the error to the backends set in the aware.storage_modules directive and then calls the original error handler(s).
 
-The backend storage is abstracted from away and each backend storage is a separate PHP extension. 
-The backend will receive a zval * containing information about the current error which it usually 
-serializes and stores based on it's own configuration. 
+Each backend storage is a separate PHP extension and additional backends can therefore easily be added, see @URL-FOR-ADDING-BE-HERE@ 
+The backend will receive a zval * containing information about the current error which it then stores based on it's own configuration. 
 
-Currently it is possible to chain the backends to allow configurations such as store the event to 
-tokyo tyrant and send snmp trap as well.
+It is possible to chain the backends to store the event in multiple backends, i.e: send an email and then log to Elasticsearch, for example.
+
+The basic flow is:
+
+  - JaM startup overrides zend_error_cb() with interceptor and stores a pointer to the original callback
+
+  - PHP error happens: 
+    -> Zend Engine calls zend_error_cb() which passes the event to our callback
+      -> JaM main ext loops through all configured backends and passes the following:
+	```
+	const char *uuid; /* uniq ID */
+	zval *event; /* struct containing info about the event */ 
+	const char *error_filename; /* filename in which the error occured */
+	long error_lineno; /* line in which the error occured */
+	long type /* error type, see http://php.net/manual/en/errorfunc.constants.php */
+	const char *appname /* app identifier string, configured with the aware.appname directive */
+	``` 
+        -> the backend stores the event as defined in its PHP_AWARE_STORE_FUNC()
+    -> call Zend Engine's original error callback 
 
 
-So the cycle is a about the following:
+# What does JaM monitor?
 
-  1. Aware startup
-    -> override zend_error_cb with interceptor and store a pointer to the original callback
-
-  2. PHP error happens 
-    -> engine calls zend_error_cb which brings the error message etc to our callback
-      -> loop through all configured backends and pass the information 
-        -> the backend (normally) serializes the event and stores based on it's config
-    -> call the original error callback 
-
-
-# What does jam monitor?
-
-  At the moment following things:
-    - php errors 
+    - php errors of all levels [i.e http://php.net/manual/en/errorfunc.constants.php] 
     - slow requests
     - peak memory usage during request
     
 
 # Available functions:
 
-> jam_event_trigger(int error_level, string message)
+* jam_event_trigger(int error_level, string message)
 
-    Trigger an event. The event gets sent into configured storage backends but the internal
-    error handler is not invoked
-
-> jam_event_get(string mod_name, string uuid)
-
-    Get event from storage backend module. Supported in 'files' and 'tokyo' backends
-
-> jam_event_get_list(string mod_name[, int start, int limit])
-  
-    Get list of events from storage backend module. Supported in 'files' and 'tokyo' backends
-  
-> jam_event_delete(string mod_name, string uuid)
-
-    Delete event from storage backend module. Supported in 'files' and 'tokyo' backends
+    Trigger an event. The event gets sent into configured storage backends but the internal error handler is not invoked.
     
-> jam_storage_module_list()
+    You can use this from your PHP code to send messages to the backend storage module.
+
+* jam_event_get(string mod_name, string uuid)
+
+    Get an event from storage backend module. Supported in 'files' and 'tokyo' backends.
+
+* jam_event_get_list(string mod_name[, int start, int limit])
   
-    Returns a list of currently configured storage backend modules
+    Returns a list of events from the storage backend module. Supported in 'files' and 'tokyo' backends.
+  
+* jam_event_delete(string mod_name, string uuid)
 
+    Deletes an event from storage backend module. Supported in 'files' and 'tokyo' backends.
+    
+* jam_storage_module_list()
+  
+    Returns a list of currently configured storage backend modules.
 
-# GUI
-
-There is a very simple GUI available in gui/ directory. It needs a lot of work.
 
 
 # Spread backend
@@ -72,6 +71,25 @@ For more information about Spread see http://www.spread.org
 
 
 # Storage backends 
+
+## elasticsearch
+    Uses JSON-C and CURL libs to send an event to an ElasticSearch server
+### Ini settings
+
+<table>
+	<th>
+		<td>Name</td>
+		<td>Type</td>
+		<td>Description</td>
+		<td>Mode</td>
+	</th>
+	<tr>
+		<td> jam_elasticsearch.host </td>
+		<td> String </td>
+		<td> The ElasticSearch URL to send the event to</td>
+		<td>PHP_INI_SYSTEM</td>
+	</tr>
+</table>
 
 ## email
     Sends an email containing information about the error

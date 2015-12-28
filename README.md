@@ -30,7 +30,7 @@ const char *uuid; // uniq ID
 zval *event; // struct containing info about the event 
 const char *error_filename; // filename in which the error occured 
 long error_lineno; // line in which the error occured 
-long type // error type, see http://php.net/manual/en/errorfunc.constants.php 
+long type; // error type, see http://php.net/manual/en/errorfunc.constants.php 
 const char *appname; // app identifier string, configured with the aware.appname directive 
 ```
 
@@ -45,30 +45,6 @@ const char *appname; // app identifier string, configured with the aware.appname
     - slow requests
     - peak memory usage during request
     
-
-# Available functions:
-
-* jam_event_trigger(int error_level, string message)
-
-    Trigger an event. The event gets sent into configured storage backends but the internal error handler is not invoked.
-    
-    You can use this from your PHP code to send messages to the backend storage module.
-
-* jam_event_get(string mod_name, string uuid)
-
-    Get an event from storage backend module. Supported in 'files' and 'tokyo' backends.
-
-* jam_event_get_list(string mod_name[, int start, int limit])
-  
-    Returns a list of events from the storage backend module. Supported in 'files' and 'tokyo' backends.
-  
-* jam_event_delete(string mod_name, string uuid)
-
-    Deletes an event from storage backend module. Supported in 'files' and 'tokyo' backends.
-    
-* jam_storage_module_list()
-  
-    Returns a list of currently configured storage backend modules.
 
 
 ## Core INI settings
@@ -101,7 +77,7 @@ const char *appname; // app identifier string, configured with the aware.appname
 	<tr>    
         <td> jam.module_error_reporting </td>
 		<td> string </td>
-		<td> Override error reporting on backend module basis (Format: tokyo=E_ALL,snmp=E_ERROR)</td>
+		<td> Override error reporting on backend module basis (Format: elasticsearch=E_ALL,email=E_ERROR)</td>
 	    <td>PHP_INI_PERDIR</td>
     </tr><tr>    
         <td> jam.depth </td>
@@ -180,6 +156,31 @@ const char *appname; // app identifier string, configured with the aware.appname
 	    <td>PHP_INI_ALL</td>
     </tr> 
 </table>
+
+# PHP functions:
+
+* jam_event_trigger(int error_level, string message)
+
+    Trigger an event. The event gets sent into configured storage backends but the internal error handler is not invoked.
+    
+    You can use this from your PHP code to send messages to the backend storage module.
+
+* jam_event_get(string mod_name, string uuid)
+
+    Get an event from storage backend module. Supported in 'files' and 'tokyo' backends.
+
+* jam_event_get_list(string mod_name[, int start, int limit])
+  
+    Returns a list of events from the storage backend module. Supported in 'files' and 'tokyo' backends.
+  
+* jam_event_delete(string mod_name, string uuid)
+
+    Deletes an event from storage backend module. Supported in 'files' and 'tokyo' backends.
+    
+* jam_storage_module_list()
+  
+    Returns a list of currently configured storage backend modules.
+
 
 
 # Storage backends 
@@ -415,4 +416,5 @@ const char *appname; // app identifier string, configured with the aware.appname
 
     
     
+## Creating additional storage backends
     

@@ -38,7 +38,7 @@ zval *event; // struct containing info about the event
 const char *error_filename; // filename in which the error occured 
 long error_lineno; // line in which the error occured 
 long type; // error type, see http://php.net/manual/en/errorfunc.constants.php 
-const char *appname; // app identifier string, configured with the aware.appname directive 
+const char *appname; // app identifier string, configured with the aware.appname directive but can be overridden from PHP code
 ```
 
 	* the backend stores the event as defined in its PHP_JAM_STORE_FUNC()

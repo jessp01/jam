@@ -79,6 +79,7 @@ $ make
 
 See "Core INI settings" for the available directives.
 
+### Compiling backend extensions
 By itself JaM will do pretty much nothing for you, next, select the backends you are interested in and cd into their dir under storage, for instance, if you are interested in the elasticsearch backend:
 ```
 $ cd storage/elasticsearch

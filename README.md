@@ -1,7 +1,8 @@
 # What is JaM?
 
 JaM is a PHP monitoring system that supports storing PHP errors (events) into different storage backends. 
-The events can be later retrieved from backends that support retrieval.
+
+The events can later be retrieved from backends that implement PHP_AWARE_GET_FUNC().
 
 # How does it work?
 
@@ -64,11 +65,6 @@ The basic flow is:
 
 
 
-# Spread backend
-
-This product uses software developed by Spread Concepts LLC for use in the Spread toolkit. 
-For more information about Spread see http://www.spread.org
-
 
 # Storage backends 
 
@@ -77,12 +73,12 @@ For more information about Spread see http://www.spread.org
 ### Ini settings
 
 <table>
-	<th>
+	<tr>
 		<td>Name</td>
 		<td>Type</td>
 		<td>Description</td>
 		<td>Mode</td>
-	</th>
+	</tr>
 	<tr>
 		<td> jam_elasticsearch.host </td>
 		<td> String </td>
@@ -157,6 +153,10 @@ For more information about Spread see http://www.spread.org
     
 ## spread
     Sends the event to a spread network
+
+    This product uses software developed by Spread Concepts LLC for use in the Spread toolkit. 
+    For more information about Spread see http://www.spread.org
+
     
 ### Ini settings
 

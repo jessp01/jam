@@ -16,8 +16,8 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_REQUEST_H_
-# define _PHP_AWARE_REQUEST_H_
+#ifndef _PHP_JAM_REQUEST_H_
+# define _PHP_JAM_REQUEST_H_
 
 #include "php_jam_private.h"
 
@@ -38,4 +38,4 @@ void php_jam_monitor_slow_request(struct timeval *, struct rusage *, long);
 /* }}} */
 #endif /* HAVE_GETTIMEOFDAY */
 
-#endif /* _PHP_AWARE_REQUEST_H_ */
+#endif /* _PHP_JAM_REQUEST_H_ */

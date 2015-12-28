@@ -2,7 +2,7 @@
 
 JaM is a PHP monitoring system that supports storing PHP errors (events) into different storage backends. 
 
-The events can later be retrieved from backends that implement PHP_AWARE_GET_FUNC().
+The events can later be retrieved from backends that implement PHP_JAM_GET_FUNC().
 
 # How does it work?
 
@@ -28,7 +28,7 @@ The basic flow is:
 	long type /* error type, see http://php.net/manual/en/errorfunc.constants.php */
 	const char *appname /* app identifier string, configured with the aware.appname directive */
 	``` 
-        -> the backend stores the event as defined in its PHP_AWARE_STORE_FUNC()
+        -> the backend stores the event as defined in its PHP_JAM_STORE_FUNC()
     -> call Zend Engine's original error callback 
 
 

@@ -16,10 +16,10 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_SNMP_H_
-# define _PHP_AWARE_SNMP_H_
+#ifndef _PHP_JAM_SNMP_H_
+# define _PHP_JAM_SNMP_H_
 
-#define PHP_AWARE_SNMP_EXTVER "0.0.1-dev"
+#define PHP_JAM_SNMP_EXTVER "0.0.1-dev"
 
 #include "php.h"
 #include "php_ini.h"
@@ -60,9 +60,9 @@ ZEND_END_MODULE_GLOBALS(jam_snmp)
 ZEND_EXTERN_MODULE_GLOBALS(jam_snmp)
 
 #ifdef ZTS
-# define AWARE_SNMP_G(v) TSRMG(jam_snmp_globals_id, zend_jam_snmp_globals *, v)
+# define JAM_SNMP_G(v) TSRMG(jam_snmp_globals_id, zend_jam_snmp_globals *, v)
 #else
-# define AWARE_SNMP_G(v) (jam_snmp_globals.v)
+# define JAM_SNMP_G(v) (jam_snmp_globals.v)
 #endif
 
 /* Hook into jam module */
@@ -73,6 +73,6 @@ extern php_jam_storage_module php_jam_storage_module_snmp;
 extern zend_module_entry jam_snmp_module_entry;
 #define phpext_jam_snmp_ptr &jam_snmp_module_entry
 
-PHP_AWARE_STORAGE_FUNCS(snmp);
+PHP_JAM_STORAGE_FUNCS(snmp);
 
 #endif

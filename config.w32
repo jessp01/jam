@@ -1,7 +1,7 @@
 ARG_ENABLE("jam", "jam support", "no");
 
-if (PHP_AWARE != "no") {
-  AC_DEFINE('HAVE_AWARE', 1);
+if (PHP_JAM != "no") {
+  AC_DEFINE('HAVE_JAM', 1);
   CHECK_LIB("Rpcrt4.lib", "jam", "C:\\Windows\\system32");
 	EXTENSION('jam', 'jam.c jam_request.c jam_storage.c jam_uuid.c');
 }

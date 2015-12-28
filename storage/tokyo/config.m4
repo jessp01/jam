@@ -10,10 +10,10 @@ PHP_ARG_WITH(jam-tokyo-cabinet,   DIR to Tokyo Cabinet installation,
 PHP_ARG_ENABLE(jam-debug,         whether to enable debugging,
 [  --enable-jam-debug             Enable debugging], no, no)
 
-if test "$PHP_AWARE_TOKYO" != "no"; then
+if test "$PHP_JAM_TOKYO" != "no"; then
 
-  if test "$PHP_AWARE_DEBUG" != "no"; then
-    AC_DEFINE([_AWARE_DEBUG_], 1, [Enable debugging])
+  if test "$PHP_JAM_DEBUG" != "no"; then
+    AC_DEFINE([_JAM_DEBUG_], 1, [Enable debugging])
   fi
   
 dnl check pkg-config
@@ -26,10 +26,10 @@ dnl check pkg-config
   ORIG_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
 
 dnl Tokyo Tyrant PKG_CONFIG
-  if test "$PHP_AWARE_TOKYO_TYRANT" = "no"; then
+  if test "$PHP_JAM_TOKYO_TYRANT" = "no"; then
     export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/lib/pkgconfig:/opt/local/lib/pkgconfig
   else
-    export PKG_CONFIG_PATH=$PHP_AWARE_TOKYO_TYRANT:$PHP_AWARE_TOKYO_TYRANT/lib/pkgconfig
+    export PKG_CONFIG_PATH=$PHP_JAM_TOKYO_TYRANT:$PHP_JAM_TOKYO_TYRANT/lib/pkgconfig
   fi
 
   AC_MSG_CHECKING([for Tokyo Tyrant])
@@ -38,7 +38,7 @@ dnl Tokyo Tyrant PKG_CONFIG
     PHP_TYRANT_LIBS=`$PKG_CONFIG tokyotyrant --libs`
     PHP_TYRANT_VERSION=`$PKG_CONFIG tokyotyrant --modversion`
 
-    PHP_EVAL_LIBLINE($PHP_TYRANT_LIBS, AWARE_TOKYO_SHARED_LIBADD)
+    PHP_EVAL_LIBLINE($PHP_TYRANT_LIBS, JAM_TOKYO_SHARED_LIBADD)
     PHP_EVAL_INCLINE($PHP_TYRANT_INCS)
     AC_MSG_RESULT([yes, ${PHP_TYRANT_VERSION}])
   else
@@ -55,13 +55,13 @@ dnl Tokyo Tyrant PKG_CONFIG
   AC_MSG_RESULT(yes)
 
   PHP_TYRANT_VERSION_MASK=`echo ${PHP_TYRANT_VERSION_STRING} | awk 'BEGIN { FS = "."; } { printf "%d", ($1 * 1000 + $2) * 1000 + $3;}'`
-  AC_DEFINE_UNQUOTED(PHP_AWARE_TOKYO_TYRANT_VERSION, ${PHP_TYRANT_VERSION_MASK}, [ ])
+  AC_DEFINE_UNQUOTED(PHP_JAM_TOKYO_TYRANT_VERSION, ${PHP_TYRANT_VERSION_MASK}, [ ])
 
 dnl Tokyo Cabinet PKG_CONFIG
-  if test "$PHP_AWARE_TOKYO_CABINET_DIR" = "no"; then
+  if test "$PHP_JAM_TOKYO_CABINET_DIR" = "no"; then
     export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/lib/pkgconfig:/opt/local/lib/pkgconfig
   else
-    export PKG_CONFIG_PATH=$PHP_AWARE_TOKYO_CABINET_DIR:$PHP_AWARE_TOKYO_CABINET_DIR/lib/pkgconfig
+    export PKG_CONFIG_PATH=$PHP_JAM_TOKYO_CABINET_DIR:$PHP_JAM_TOKYO_CABINET_DIR/lib/pkgconfig
   fi
 
   AC_MSG_CHECKING([for Tokyo Cabinet])
@@ -70,7 +70,7 @@ dnl Tokyo Cabinet PKG_CONFIG
     PHP_CABINET_LIBS=`$PKG_CONFIG tokyocabinet --libs`
     PHP_CABINET_VERSION=`$PKG_CONFIG tokyocabinet --modversion`
 
-    PHP_EVAL_LIBLINE($PHP_CABINET_LIBS, AWARE_TOKYO_SHARED_LIBADD)
+    PHP_EVAL_LIBLINE($PHP_CABINET_LIBS, JAM_TOKYO_SHARED_LIBADD)
     PHP_EVAL_INCLINE($PHP_CABINET_INCS)
     AC_MSG_RESULT([yes, ${PHP_CABINET_VERSION}])
   else
@@ -83,5 +83,5 @@ dnl Tokyo Cabinet PKG_CONFIG
   PHP_NEW_EXTENSION(jam_tokyo, jam_tokyo.c jam_tokyo_cabinet.c jam_tokyo_tyrant.c, $ext_shared)
   PHP_ADD_EXTENSION_DEP(jam_tokyo, jam)
 
-  PHP_SUBST(AWARE_TOKYO_SHARED_LIBADD)
+  PHP_SUBST(JAM_TOKYO_SHARED_LIBADD)
 fi

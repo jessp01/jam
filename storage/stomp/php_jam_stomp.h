@@ -16,10 +16,10 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_STOMP_H_
-# define _PHP_AWARE_STOMP_H_
+#ifndef _PHP_JAM_STOMP_H_
+# define _PHP_JAM_STOMP_H_
 
-#define PHP_AWARE_STOMP_EXTVER "0.0.1-dev"
+#define PHP_JAM_STOMP_EXTVER "0.0.1-dev"
 
 #include "php.h"
 #include "php_ini.h"
@@ -53,9 +53,9 @@ ZEND_END_MODULE_GLOBALS(jam_stomp)
 ZEND_EXTERN_MODULE_GLOBALS(jam_stomp)
 
 #ifdef ZTS
-# define AWARE_STOMP_G(v) TSRMG(jam_stomp_globals_id, zend_jam_stomp_globals *, v)
+# define JAM_STOMP_G(v) TSRMG(jam_stomp_globals_id, zend_jam_stomp_globals *, v)
 #else
-# define AWARE_STOMP_G(v) (jam_stomp_globals.v)
+# define JAM_STOMP_G(v) (jam_stomp_globals.v)
 #endif
 
 /* Hook into jam module */
@@ -66,7 +66,7 @@ extern php_jam_storage_module php_jam_storage_module_stomp;
 extern zend_module_entry jam_stomp_module_entry;
 #define phpext_jam_stomp_ptr &jam_stomp_module_entry
 
-PHP_AWARE_STORAGE_FUNCS(stomp);
+PHP_JAM_STORAGE_FUNCS(stomp);
 
 #ifndef ZSTR
 # define ZSTR

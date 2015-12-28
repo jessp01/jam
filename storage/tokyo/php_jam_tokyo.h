@@ -16,10 +16,10 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_TOKYO_H_
-# define _PHP_AWARE_TOKYO_H_
+#ifndef _PHP_JAM_TOKYO_H_
+# define _PHP_JAM_TOKYO_H_
 
-#define PHP_AWARE_TOKYO_EXTVER "0.0.1-dev"
+#define PHP_JAM_TOKYO_EXTVER "0.0.1-dev"
 
 #include "php.h"
 #include "php_ini.h"
@@ -69,9 +69,9 @@ ZEND_END_MODULE_GLOBALS(jam_tokyo)
 ZEND_EXTERN_MODULE_GLOBALS(jam_tokyo)
 
 #ifdef ZTS
-# define AWARE_TOKYO_G(v) TSRMG(jam_tokyo_globals_id, zend_jam_tokyo_globals *, v)
+# define JAM_TOKYO_G(v) TSRMG(jam_tokyo_globals_id, zend_jam_tokyo_globals *, v)
 #else
-# define AWARE_TOKYO_G(v) (jam_tokyo_globals.v)
+# define JAM_TOKYO_G(v) (jam_tokyo_globals.v)
 #endif
 
 /* Hook into jam module */
@@ -82,6 +82,6 @@ extern php_jam_storage_module php_jam_storage_module_tokyo;
 extern zend_module_entry jam_tokyo_module_entry;
 #define phpext_jam_tokyo_ptr &jam_tokyo_module_entry
 
-PHP_AWARE_STORAGE_FUNCS(tokyo);
+PHP_JAM_STORAGE_FUNCS(tokyo);
 
 #endif

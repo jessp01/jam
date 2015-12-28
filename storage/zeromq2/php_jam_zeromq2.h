@@ -16,10 +16,10 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_ZEROMQ2_H_
-# define _PHP_AWARE_ZEROMQ2_H_
+#ifndef _PHP_JAM_ZEROMQ2_H_
+# define _PHP_JAM_ZEROMQ2_H_
 
-#define PHP_AWARE_ZEROMQ2_EXTVER "0.0.1-dev"
+#define PHP_JAM_ZEROMQ2_EXTVER "0.0.1-dev"
 
 #include "php.h"
 #include "php_ini.h"
@@ -53,9 +53,9 @@ ZEND_END_MODULE_GLOBALS(jam_zeromq2)
 ZEND_EXTERN_MODULE_GLOBALS(jam_zeromq2)
 
 #ifdef ZTS
-# define AWARE_ZEROMQ2_G(v) TSRMG(jam_zeromq2_globals_id, zend_jam_zeromq2_globals *, v)
+# define JAM_ZEROMQ2_G(v) TSRMG(jam_zeromq2_globals_id, zend_jam_zeromq2_globals *, v)
 #else
-# define AWARE_ZEROMQ2_G(v) (jam_zeromq2_globals.v)
+# define JAM_ZEROMQ2_G(v) (jam_zeromq2_globals.v)
 #endif
 
 /* Hook into jam module */
@@ -66,6 +66,6 @@ extern php_jam_storage_module php_jam_storage_module_zeromq2;
 extern zend_module_entry jam_zeromq2_module_entry;
 #define phpext_jam_zeromq2_ptr &jam_zeromq2_module_entry
 
-PHP_AWARE_STORAGE_FUNCS(zeromq2);
+PHP_JAM_STORAGE_FUNCS(zeromq2);
 
 #endif

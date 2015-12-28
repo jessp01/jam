@@ -1,8 +1,8 @@
 ARG_ENABLE("jam-stomp", "jam stomp support", "no");
 
-if (PHP_AWARE_STOMP != "no") {
+if (PHP_JAM_STOMP != "no") {
 
-  AC_DEFINE('HAVE_AWARE_STOMP', 1);
+  AC_DEFINE('HAVE_JAM_STOMP', 1);
 	EXTENSION('jam_stomp', 'jam_stomp.c');
 	
 	ADD_EXTENSION_DEP('jam_stomp', 'jam', true);

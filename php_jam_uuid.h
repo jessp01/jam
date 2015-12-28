@@ -16,12 +16,12 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_UUID_H_
-# define _PHP_AWARE_UUID_H_
+#ifndef _PHP_JAM_UUID_H_
+# define _PHP_JAM_UUID_H_
 
 /*
-	User must pass in buffer at least the size of PHP_AWARE_UUID_LEN + 1
-	PHP_AWARE_UUID_LEN is defined in php_jam_storage.h
+	User must pass in buffer at least the size of PHP_JAM_UUID_LEN + 1
+	PHP_JAM_UUID_LEN is defined in php_jam_storage.h
 */
 zend_bool php_jam_generate_uuid(char *);
 

@@ -17,10 +17,10 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_ELASTICSEARCH_H_
-# define _PHP_AWARE_ELASTICSEARCH_H_
+#ifndef _PHP_JAM_ELASTICSEARCH_H_
+# define _PHP_JAM_ELASTICSEARCH_H_
 
-#define PHP_AWARE_ELASTICSEARCH_EXTVER "0.0.1-dev"
+#define PHP_JAM_ELASTICSEARCH_EXTVER "0.0.1-dev"
 
 #include "php.h"
 #include "php_ini.h"
@@ -49,9 +49,9 @@ ZEND_END_MODULE_GLOBALS(jam_elasticsearch)
 ZEND_EXTERN_MODULE_GLOBALS(jam_elasticsearch)
 
 #ifdef ZTS
-# define AWARE_ELASTICSEARCH_G(v) TSRMG(jam_elasticsearch_globals_id, zend_jam_elasticsearch_globals *, v)
+# define JAM_ELASTICSEARCH_G(v) TSRMG(jam_elasticsearch_globals_id, zend_jam_elasticsearch_globals *, v)
 #else
-# define AWARE_ELASTICSEARCH_G(v) (jam_elasticsearch_globals.v)
+# define JAM_ELASTICSEARCH_G(v) (jam_elasticsearch_globals.v)
 #endif
 
 /* Hook into jam module */
@@ -62,6 +62,6 @@ extern php_jam_storage_module php_jam_storage_module_elasticsearch;
 extern zend_module_entry jam_elasticsearch_module_entry;
 #define phpext_jam_elasticsearch_ptr &jam_elasticsearch_module_entry
 
-PHP_AWARE_STORAGE_FUNCS(elasticsearch);
+PHP_JAM_STORAGE_FUNCS(elasticsearch);
 
 #endif

@@ -26,8 +26,8 @@ void php_jam_cache_init(php_jam_serialize_cache *cache)
 	cache->data     = NULL;
 	cache->data_len = 0;
 	
-	cache->uuid = malloc(PHP_AWARE_UUID_LEN + 1);
-	memset(cache->uuid, 0, PHP_AWARE_UUID_LEN + 1);
+	cache->uuid = malloc(PHP_JAM_UUID_LEN + 1);
+	memset(cache->uuid, 0, PHP_JAM_UUID_LEN + 1);
 }
 /* }}} */
 
@@ -36,7 +36,7 @@ void php_jam_cache_init(php_jam_serialize_cache *cache)
 void php_jam_cache_clean(php_jam_serialize_cache *cache)
 {
 	free(cache->data);
-	memset(cache->uuid, 0, PHP_AWARE_UUID_LEN + 1);
+	memset(cache->uuid, 0, PHP_JAM_UUID_LEN + 1);
 	
 	cache->data     = NULL;
 	cache->data_len = 0;
@@ -67,8 +67,8 @@ void php_jam_cache_store(php_jam_serialize_cache *cache, const char *uuid, smart
 	cache->data     = strdup(data->c);
 	cache->data_len = data->len;
 	
-	memcpy(cache->uuid, uuid, PHP_AWARE_UUID_LEN);
-	cache->uuid[PHP_AWARE_UUID_LEN] = '\0';
+	memcpy(cache->uuid, uuid, PHP_JAM_UUID_LEN);
+	cache->uuid[PHP_JAM_UUID_LEN] = '\0';
 
 	cache->has_item = 1;
 }

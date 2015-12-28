@@ -21,55 +21,55 @@
 ZEND_DECLARE_MODULE_GLOBALS(jam_spread)
 
 php_jam_storage_module php_jam_storage_module_spread = {
-	PHP_AWARE_STORAGE_MOD(spread)
+	PHP_JAM_STORAGE_MOD(spread)
 };
 
-PHP_AWARE_CONNECT_FUNC(spread)
+PHP_JAM_CONNECT_FUNC(spread)
 {	
-	if (!AWARE_SPREAD_G(connected)) {
+	if (!JAM_SPREAD_G(connected)) {
 		int retval;
 		char private_group[MAX_GROUP_NAME];
 		
-		retval = SP_connect(AWARE_SPREAD_G(spread_name), AWARE_SPREAD_G(user_name), 0, 1, &AWARE_SPREAD_G(spread_mailbox), private_group);
+		retval = SP_connect(JAM_SPREAD_G(spread_name), JAM_SPREAD_G(user_name), 0, 1, &JAM_SPREAD_G(spread_mailbox), private_group);
 	
 		if (retval < 0) {
 			return AwareOperationFailed;
 		}
-		AWARE_SPREAD_G(connected) = 1;
+		JAM_SPREAD_G(connected) = 1;
 	}
 	
 	return AwareOperationSuccess;
 }
 
-PHP_AWARE_GET_FUNC(spread)
+PHP_JAM_GET_FUNC(spread)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_STORE_FUNC(spread)
+PHP_JAM_STORE_FUNC(spread)
 {
 	int retval;
 	smart_str string = {0};
 	
 	php_jam_storage_serialize(uuid, event, &string TSRMLS_CC);
 	
-	retval = SP_multicast(AWARE_SPREAD_G(spread_mailbox), AGREED_MESS, AWARE_SPREAD_G(group_name), 1, string.len, string.c);
+	retval = SP_multicast(JAM_SPREAD_G(spread_mailbox), AGREED_MESS, JAM_SPREAD_G(group_name), 1, string.len, string.c);
 	smart_str_free(&string);
 	
 	return (retval < 0) ? AwareOperationFailed : AwareOperationSuccess;
 }
 
-PHP_AWARE_GET_LIST_FUNC(spread)
+PHP_JAM_GET_LIST_FUNC(spread)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DELETE_FUNC(spread)
+PHP_JAM_DELETE_FUNC(spread)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DISCONNECT_FUNC(spread)
+PHP_JAM_DISCONNECT_FUNC(spread)
 {
 	return AwareOperationNotSupported;
 }
@@ -97,24 +97,24 @@ PHP_MINIT_FUNCTION(jam_spread)
 	ZEND_INIT_MODULE_GLOBALS(jam_spread, php_jam_spread_init_globals, NULL);
 	REGISTER_INI_ENTRIES();
 	
-	reg_status = PHP_AWARE_STORAGE_REGISTER(spread);
+	reg_status = PHP_JAM_STORAGE_REGISTER(spread);
 	
 	switch (reg_status) 
 	{
 		case AwareModuleRegistered:	
-			AWARE_SPREAD_G(enabled) = 1;
+			JAM_SPREAD_G(enabled) = 1;
 			
-			if (!AWARE_SPREAD_G(spread_name)) {
+			if (!JAM_SPREAD_G(spread_name)) {
 				php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_spread, missing jam_spread.spread_name");
 				return FAILURE;
 			}
 			
-			if (!AWARE_SPREAD_G(group_name)) {
+			if (!JAM_SPREAD_G(group_name)) {
 				php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_spread, missing jam_spread.group_name");
 				return FAILURE;
 			}
 			
-			if (!AWARE_SPREAD_G(user_name)) {
+			if (!JAM_SPREAD_G(user_name)) {
 				php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_spread, missing jam_spread.user_name");
 				return FAILURE;
 			}
@@ -122,12 +122,12 @@ PHP_MINIT_FUNCTION(jam_spread)
 		break;
 		
 		case AwareModuleFailed:
-			AWARE_SPREAD_G(enabled) = 0;
+			JAM_SPREAD_G(enabled) = 0;
 			return FAILURE;
 		break;
 
 		case AwareModuleNotConfigured:
-			AWARE_SPREAD_G(enabled) = 0;
+			JAM_SPREAD_G(enabled) = 0;
 		break;	
 	}
 	return SUCCESS;
@@ -139,9 +139,9 @@ PHP_MSHUTDOWN_FUNCTION(jam_spread)
 {
 	UNREGISTER_INI_ENTRIES();
 	
-	if (AWARE_SPREAD_G(connected)) {
-		SP_disconnect(AWARE_SPREAD_G(spread_mailbox));
-		AWARE_SPREAD_G(connected) = 0;
+	if (JAM_SPREAD_G(connected)) {
+		SP_disconnect(JAM_SPREAD_G(spread_mailbox));
+		JAM_SPREAD_G(connected) = 0;
 	}
 	return SUCCESS;
 }
@@ -153,7 +153,7 @@ PHP_MINFO_FUNCTION(jam_spread)
 {	
 	php_info_print_table_start();
 	php_info_print_table_row(2, "jam_spread storage", "enabled");
-	php_info_print_table_row(2, "jam_spread version", PHP_AWARE_SPREAD_EXTVER);
+	php_info_print_table_row(2, "jam_spread version", PHP_JAM_SPREAD_EXTVER);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES(); 
@@ -172,10 +172,10 @@ zend_module_entry jam_spread_module_entry = {
         NULL,
         NULL,
         PHP_MINFO(jam_spread),
-    	PHP_AWARE_SPREAD_EXTVER,
+    	PHP_JAM_SPREAD_EXTVER,
         STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_AWARE_SPREAD
+#ifdef COMPILE_DL_JAM_SPREAD
 ZEND_GET_MODULE(jam_spread)
 #endif

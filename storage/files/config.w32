@@ -1,8 +1,8 @@
 ARG_ENABLE("jam-files", "jam files support", "no");
 
-if (PHP_AWARE_FILES != "no") {
+if (PHP_JAM_FILES != "no") {
 
-  AC_DEFINE('HAVE_AWARE_FILES', 1);
+  AC_DEFINE('HAVE_JAM_FILES', 1);
 	EXTENSION('jam_files', 'jam_files.c');
 	
 	ADD_EXTENSION_DEP('jam_files', 'jam', true);

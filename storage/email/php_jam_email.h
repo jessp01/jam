@@ -16,10 +16,10 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_EMAIL_H_
-# define _PHP_AWARE_EMAIL_H_
+#ifndef _PHP_JAM_EMAIL_H_
+# define _PHP_JAM_EMAIL_H_
 
-#define PHP_AWARE_EMAIL_EXTVER "0.0.1-dev"
+#define PHP_JAM_EMAIL_EXTVER "0.0.1-dev"
 
 #include "php.h"
 #include "php_ini.h"
@@ -42,9 +42,9 @@ ZEND_END_MODULE_GLOBALS(jam_email)
 ZEND_EXTERN_MODULE_GLOBALS(jam_email)
 
 #ifdef ZTS
-# define AWARE_EMAIL_G(v) TSRMG(jam_email_globals_id, zend_jam_email_globals *, v)
+# define JAM_EMAIL_G(v) TSRMG(jam_email_globals_id, zend_jam_email_globals *, v)
 #else
-# define AWARE_EMAIL_G(v) (jam_email_globals.v)
+# define JAM_EMAIL_G(v) (jam_email_globals.v)
 #endif
 
 /* Hook into jam module */
@@ -55,6 +55,6 @@ extern php_jam_storage_module php_jam_storage_module_email;
 extern zend_module_entry jam_email_module_entry;
 #define phpext_jam_email_ptr &jam_email_module_entry
 
-PHP_AWARE_STORAGE_FUNCS(email);
+PHP_JAM_STORAGE_FUNCS(email);
 
 #endif

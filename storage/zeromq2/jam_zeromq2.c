@@ -21,52 +21,52 @@
 ZEND_DECLARE_MODULE_GLOBALS(jam_zeromq2)
 
 php_jam_storage_module php_jam_storage_module_zeromq2 = {
-	PHP_AWARE_STORAGE_MOD(zeromq2)
+	PHP_JAM_STORAGE_MOD(zeromq2)
 };
 
-PHP_AWARE_CONNECT_FUNC(zeromq2)
+PHP_JAM_CONNECT_FUNC(zeromq2)
 {
 	int rc, linger = 100;
 	
-	if (AWARE_ZEROMQ2_G(connected)) {
+	if (JAM_ZEROMQ2_G(connected)) {
 		return AwareOperationSuccess;
 	}
 	
-	if (!AWARE_ZEROMQ2_G(ctx)) {
-		AWARE_ZEROMQ2_G(ctx) = zmq_init(1);
+	if (!JAM_ZEROMQ2_G(ctx)) {
+		JAM_ZEROMQ2_G(ctx) = zmq_init(1);
 		
-		if (!AWARE_ZEROMQ2_G(ctx)) {
+		if (!JAM_ZEROMQ2_G(ctx)) {
 			return AwareOperationFailed;
 		}
 	}
 	
-	if (!AWARE_ZEROMQ2_G(socket)) {
-		AWARE_ZEROMQ2_G(socket) = zmq_socket(AWARE_ZEROMQ2_G(ctx), ZMQ_PUB);
+	if (!JAM_ZEROMQ2_G(socket)) {
+		JAM_ZEROMQ2_G(socket) = zmq_socket(JAM_ZEROMQ2_G(ctx), ZMQ_PUB);
 	
-		if (!AWARE_ZEROMQ2_G(socket)) {
-			zmq_term(AWARE_ZEROMQ2_G(ctx));
+		if (!JAM_ZEROMQ2_G(socket)) {
+			zmq_term(JAM_ZEROMQ2_G(ctx));
 			
-			AWARE_ZEROMQ2_G(ctx) = NULL;
+			JAM_ZEROMQ2_G(ctx) = NULL;
 			return AwareOperationFailed;
 		}
 	}
 
-	rc = zmq_connect(AWARE_ZEROMQ2_G(socket), AWARE_ZEROMQ2_G(dsn));
+	rc = zmq_connect(JAM_ZEROMQ2_G(socket), JAM_ZEROMQ2_G(dsn));
 
 #ifdef ZMQ_LINGER	
-	(void) zmq_setsockopt(AWARE_ZEROMQ2_G(socket), ZMQ_LINGER, &linger, sizeof(int));
+	(void) zmq_setsockopt(JAM_ZEROMQ2_G(socket), ZMQ_LINGER, &linger, sizeof(int));
 #endif
 
-	AWARE_ZEROMQ2_G(connected) = (rc == 0);
+	JAM_ZEROMQ2_G(connected) = (rc == 0);
 	return (rc == 0) ? AwareOperationSuccess : AwareOperationFailed;
 }
 
-PHP_AWARE_GET_FUNC(zeromq2)
+PHP_JAM_GET_FUNC(zeromq2)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_STORE_FUNC(zeromq2)
+PHP_JAM_STORE_FUNC(zeromq2)
 {
 	size_t topic_len, pos = 0;
 	int rc;
@@ -76,7 +76,7 @@ PHP_AWARE_STORE_FUNC(zeromq2)
 	
 	php_jam_storage_serialize(uuid, event, &string TSRMLS_CC);
 	
-	topic_len = strlen(AWARE_ZEROMQ2_G(topic));
+	topic_len = strlen(JAM_ZEROMQ2_G(topic));
 	
 	if (topic_len) {
 		rc = zmq_msg_init_size(&msg, string.len + topic_len + 1 + 1);
@@ -90,13 +90,13 @@ PHP_AWARE_STORE_FUNC(zeromq2)
 	}
 	
 	if (topic_len) {
-		memcpy((void *)zmq_msg_data(&msg), AWARE_ZEROMQ2_G(topic), topic_len);
+		memcpy((void *)zmq_msg_data(&msg), JAM_ZEROMQ2_G(topic), topic_len);
 		memcpy((void *)zmq_msg_data(&msg) + topic_len, "|", 1);
 		pos = topic_len + 1;
 	}
 	memcpy((void *)zmq_msg_data(&msg) + pos, string.c, string.len + 1);
 	
-	rc = zmq_send(AWARE_ZEROMQ2_G(socket), &msg, ZMQ_NOBLOCK);
+	rc = zmq_send(JAM_ZEROMQ2_G(socket), &msg, ZMQ_NOBLOCK);
 	
 	zmq_msg_close(&msg);
 	smart_str_free(&string);
@@ -104,17 +104,17 @@ PHP_AWARE_STORE_FUNC(zeromq2)
 	return (rc == 0) ? AwareOperationSuccess : AwareOperationFailed;
 }
 
-PHP_AWARE_GET_LIST_FUNC(zeromq2)
+PHP_JAM_GET_LIST_FUNC(zeromq2)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DELETE_FUNC(zeromq2)
+PHP_JAM_DELETE_FUNC(zeromq2)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DISCONNECT_FUNC(zeromq2)
+PHP_JAM_DISCONNECT_FUNC(zeromq2)
 {
 	return AwareOperationNotSupported;
 }
@@ -139,21 +139,21 @@ PHP_MINIT_FUNCTION(jam_zeromq2)
 	ZEND_INIT_MODULE_GLOBALS(jam_zeromq2, php_jam_zeromq2_init_globals, NULL);
 	REGISTER_INI_ENTRIES();
 	
-	reg_status = PHP_AWARE_STORAGE_REGISTER(zeromq2);
+	reg_status = PHP_JAM_STORAGE_REGISTER(zeromq2);
 
 	switch (reg_status) 
 	{
 		case AwareModuleRegistered:	
-			AWARE_ZEROMQ2_G(enabled) = 1;
+			JAM_ZEROMQ2_G(enabled) = 1;
 		break;
 		
 		case AwareModuleFailed:
-			AWARE_ZEROMQ2_G(enabled) = 0;
+			JAM_ZEROMQ2_G(enabled) = 0;
 			return FAILURE;
 		break;
 
 		case AwareModuleNotConfigured:
-			AWARE_ZEROMQ2_G(enabled) = 0;
+			JAM_ZEROMQ2_G(enabled) = 0;
 		break;	
 	}
 	return SUCCESS;
@@ -163,14 +163,14 @@ PHP_MINIT_FUNCTION(jam_zeromq2)
 /* {{{ PHP_MSHUTDOWN_FUNCTION(jam_zeromq2) */
 PHP_MSHUTDOWN_FUNCTION(jam_zeromq2)
 {
-	if (AWARE_ZEROMQ2_G(enabled)) {
-		if (AWARE_ZEROMQ2_G(socket)) {
-			zmq_close(AWARE_ZEROMQ2_G(socket));
-			AWARE_ZEROMQ2_G(socket) = NULL;
+	if (JAM_ZEROMQ2_G(enabled)) {
+		if (JAM_ZEROMQ2_G(socket)) {
+			zmq_close(JAM_ZEROMQ2_G(socket));
+			JAM_ZEROMQ2_G(socket) = NULL;
 		}
-		if (AWARE_ZEROMQ2_G(ctx)) {
-			zmq_term(AWARE_ZEROMQ2_G(ctx));
-			AWARE_ZEROMQ2_G(ctx) = NULL;
+		if (JAM_ZEROMQ2_G(ctx)) {
+			zmq_term(JAM_ZEROMQ2_G(ctx));
+			JAM_ZEROMQ2_G(ctx) = NULL;
 		}
 	}
 	UNREGISTER_INI_ENTRIES();
@@ -184,7 +184,7 @@ PHP_MINFO_FUNCTION(jam_zeromq2)
 {	
 	php_info_print_table_start();
 	php_info_print_table_row(2, "jam_zeromq2 storage", "enabled");
-	php_info_print_table_row(2, "jam_zeromq2 version", PHP_AWARE_ZEROMQ2_EXTVER);
+	php_info_print_table_row(2, "jam_zeromq2 version", PHP_JAM_ZEROMQ2_EXTVER);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES(); 
@@ -203,10 +203,10 @@ zend_module_entry jam_zeromq2_module_entry = {
         NULL,
         NULL,
         PHP_MINFO(jam_zeromq2),
-    	PHP_AWARE_ZEROMQ2_EXTVER,
+    	PHP_JAM_ZEROMQ2_EXTVER,
         STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_AWARE_ZEROMQ2
+#ifdef COMPILE_DL_JAM_ZEROMQ2
 ZEND_GET_MODULE(jam_zeromq2)
 #endif

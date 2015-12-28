@@ -21,35 +21,35 @@
 ZEND_DECLARE_MODULE_GLOBALS(jam_skeleton)
 
 php_jam_storage_module php_jam_storage_module_skeleton = {
-	PHP_AWARE_STORAGE_MOD(skeleton)
+	PHP_JAM_STORAGE_MOD(skeleton)
 };
 
-PHP_AWARE_CONNECT_FUNC(skeleton)
+PHP_JAM_CONNECT_FUNC(skeleton)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_GET_FUNC(skeleton)
+PHP_JAM_GET_FUNC(skeleton)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_STORE_FUNC(skeleton)
+PHP_JAM_STORE_FUNC(skeleton)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_GET_LIST_FUNC(skeleton)
+PHP_JAM_GET_LIST_FUNC(skeleton)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DELETE_FUNC(skeleton)
+PHP_JAM_DELETE_FUNC(skeleton)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DISCONNECT_FUNC(skeleton)
+PHP_JAM_DISCONNECT_FUNC(skeleton)
 {
 	return AwareOperationNotSupported;
 }
@@ -71,21 +71,21 @@ PHP_MINIT_FUNCTION(jam_skeleton)
 	ZEND_INIT_MODULE_GLOBALS(jam_skeleton, php_jam_skeleton_init_globals, NULL);
 	REGISTER_INI_ENTRIES();
 	
-	reg_status = PHP_AWARE_STORAGE_REGISTER(skeleton);
+	reg_status = PHP_JAM_STORAGE_REGISTER(skeleton);
 	
 	switch (reg_status) 
 	{
 		case AwareModuleRegistered:	
-			AWARE_SKELETON_G(enabled) = 1;
+			JAM_SKELETON_G(enabled) = 1;
 		break;
 		
 		case AwareModuleFailed:
-			AWARE_SKELETON_G(enabled) = 0;
+			JAM_SKELETON_G(enabled) = 0;
 			return FAILURE;
 		break;
 
 		case AwareModuleNotConfigured:
-			AWARE_SKELETON_G(enabled) = 0;
+			JAM_SKELETON_G(enabled) = 0;
 		break;	
 	}
 	return SUCCESS;
@@ -106,7 +106,7 @@ PHP_MINFO_FUNCTION(jam_skeleton)
 {	
 	php_info_print_table_start();
 	php_info_print_table_row(2, "jam_skeleton storage", "enabled");
-	php_info_print_table_row(2, "jam_skeleton version", PHP_AWARE_SKELETON_EXTVER);
+	php_info_print_table_row(2, "jam_skeleton version", PHP_JAM_SKELETON_EXTVER);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES(); 
@@ -125,10 +125,10 @@ zend_module_entry jam_skeleton_module_entry = {
         NULL,
         NULL,
         PHP_MINFO(jam_skeleton),
-    	PHP_AWARE_SKELETON_EXTVER,
+    	PHP_JAM_SKELETON_EXTVER,
         STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_AWARE_SKELETON
+#ifdef COMPILE_DL_JAM_SKELETON
 ZEND_GET_MODULE(jam_skeleton)
 #endif

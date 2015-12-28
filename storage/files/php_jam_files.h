@@ -16,10 +16,10 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_FILES_H_
-# define _PHP_AWARE_FILES_H_
+#ifndef _PHP_JAM_FILES_H_
+# define _PHP_JAM_FILES_H_
 
-#define PHP_AWARE_FILES_EXTVER "0.0.1-dev"
+#define PHP_JAM_FILES_EXTVER "0.0.1-dev"
 
 #include "php.h"
 #include "php_ini.h"
@@ -42,9 +42,9 @@ ZEND_END_MODULE_GLOBALS(jam_files)
 ZEND_EXTERN_MODULE_GLOBALS(jam_files)
 
 #ifdef ZTS
-# define AWARE_FILES_G(v) TSRMG(jam_files_globals_id, zend_jam_files_globals *, v)
+# define JAM_FILES_G(v) TSRMG(jam_files_globals_id, zend_jam_files_globals *, v)
 #else
-# define AWARE_FILES_G(v) (jam_files_globals.v)
+# define JAM_FILES_G(v) (jam_files_globals.v)
 #endif
 
 /* Hook into jam module */
@@ -55,6 +55,6 @@ extern php_jam_storage_module php_jam_storage_module_files;
 extern zend_module_entry jam_files_module_entry;
 #define phpext_jam_files_ptr &jam_files_module_entry
 
-PHP_AWARE_STORAGE_FUNCS(files);
+PHP_JAM_STORAGE_FUNCS(files);
 
 #endif

@@ -21,87 +21,87 @@
 ZEND_DECLARE_MODULE_GLOBALS(jam_tokyo)
 
 php_jam_storage_module php_jam_storage_module_tokyo = {
-	PHP_AWARE_STORAGE_MOD(tokyo)
+	PHP_JAM_STORAGE_MOD(tokyo)
 };
 
-PHP_AWARE_CONNECT_FUNC(tokyo)
+PHP_JAM_CONNECT_FUNC(tokyo)
 {
 	zend_bool status = 0;
 	
-	if (AWARE_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
+	if (JAM_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
 		int mode = TDBOWRITER|TDBOCREAT;
 		
-		if (!AWARE_TOKYO_G(cabinet_block)) {
+		if (!JAM_TOKYO_G(cabinet_block)) {
 			mode |= TDBOLCKNB;
 		}
-		status = php_jam_cabinet_open(AWARE_TOKYO_G(cabinet), AWARE_TOKYO_G(cabinet_file), mode);
-	} else if (AWARE_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
-		status = php_jam_tyrant_open(AWARE_TOKYO_G(tyrant), AWARE_TOKYO_G(tyrant_host), AWARE_TOKYO_G(tyrant_port));
+		status = php_jam_cabinet_open(JAM_TOKYO_G(cabinet), JAM_TOKYO_G(cabinet_file), mode);
+	} else if (JAM_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
+		status = php_jam_tyrant_open(JAM_TOKYO_G(tyrant), JAM_TOKYO_G(tyrant_host), JAM_TOKYO_G(tyrant_port));
 	}
 	return (status) ? AwareOperationSuccess : AwareOperationFailed;
 }
 
-PHP_AWARE_GET_FUNC(tokyo)
+PHP_JAM_GET_FUNC(tokyo)
 {
 	zend_bool status = 0;
 	
-	if (AWARE_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
-		status = php_jam_cabinet_get(AWARE_TOKYO_G(cabinet), uuid, event TSRMLS_CC);
-	} else if (AWARE_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
-		status = php_jam_tyrant_get(AWARE_TOKYO_G(tyrant), uuid, event TSRMLS_CC);
+	if (JAM_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
+		status = php_jam_cabinet_get(JAM_TOKYO_G(cabinet), uuid, event TSRMLS_CC);
+	} else if (JAM_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
+		status = php_jam_tyrant_get(JAM_TOKYO_G(tyrant), uuid, event TSRMLS_CC);
 	}
 	return (status) ? AwareOperationSuccess : AwareOperationFailed;
 }
 
-PHP_AWARE_STORE_FUNC(tokyo)
+PHP_JAM_STORE_FUNC(tokyo)
 {
 	zend_bool status = 0;
 	smart_str string = {0};
 	
 	php_jam_storage_serialize(uuid, event, &string TSRMLS_CC);
 	
-	if (AWARE_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
-		status = php_jam_cabinet_put(AWARE_TOKYO_G(cabinet), uuid, string.c, string.len);
-	} else if (AWARE_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
-		status = php_jam_tyrant_put(AWARE_TOKYO_G(tyrant), uuid, string.c, string.len);
+	if (JAM_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
+		status = php_jam_cabinet_put(JAM_TOKYO_G(cabinet), uuid, string.c, string.len);
+	} else if (JAM_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
+		status = php_jam_tyrant_put(JAM_TOKYO_G(tyrant), uuid, string.c, string.len);
 	}
 	smart_str_free(&string);
 	return (status) ? AwareOperationSuccess : AwareOperationFailed;
 }
 
-PHP_AWARE_GET_LIST_FUNC(tokyo)
+PHP_JAM_GET_LIST_FUNC(tokyo)
 {
 	zend_bool status = 0;
 	
-	if (AWARE_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
-		status = php_jam_cabinet_get_list(AWARE_TOKYO_G(cabinet), start, limit, events);
-	} else if (AWARE_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
-		status = php_jam_tyrant_get_list(AWARE_TOKYO_G(tyrant), start, limit, events);
+	if (JAM_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
+		status = php_jam_cabinet_get_list(JAM_TOKYO_G(cabinet), start, limit, events);
+	} else if (JAM_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
+		status = php_jam_tyrant_get_list(JAM_TOKYO_G(tyrant), start, limit, events);
 	}
 	
 	return (status) ? AwareOperationSuccess : AwareOperationFailed;
 }
 
-PHP_AWARE_DELETE_FUNC(tokyo)
+PHP_JAM_DELETE_FUNC(tokyo)
 {
 	zend_bool status = 0;
 	
-	if (AWARE_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
-		status = php_jam_cabinet_delete(AWARE_TOKYO_G(cabinet), uuid);
-	} else if (AWARE_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
-		status = php_jam_tyrant_delete(AWARE_TOKYO_G(tyrant), uuid);
+	if (JAM_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
+		status = php_jam_cabinet_delete(JAM_TOKYO_G(cabinet), uuid);
+	} else if (JAM_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
+		status = php_jam_tyrant_delete(JAM_TOKYO_G(tyrant), uuid);
 	}
 	return (status) ? AwareOperationSuccess : AwareOperationFailed;
 }
 
-PHP_AWARE_DISCONNECT_FUNC(tokyo)
+PHP_JAM_DISCONNECT_FUNC(tokyo)
 {
 	zend_bool status = 0;
 	
-	if (AWARE_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
-		status = php_jam_cabinet_close(AWARE_TOKYO_G(cabinet));
-	} else if (AWARE_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
-		status = php_jam_tyrant_close(AWARE_TOKYO_G(tyrant));
+	if (JAM_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
+		status = php_jam_cabinet_close(JAM_TOKYO_G(cabinet));
+	} else if (JAM_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
+		status = php_jam_tyrant_close(JAM_TOKYO_G(tyrant));
 	}
 	return (status) ? AwareOperationSuccess : AwareOperationFailed;
 }
@@ -110,15 +110,15 @@ static PHP_INI_MH(OnUpdateBackend)
 {
 	if (new_value && new_value_length > 0) {
 		if (new_value_length == 6 && !strcmp(new_value, "tyrant")) {
-			AWARE_TOKYO_G(backend) = AwareTokyoBackendTyrant;			
+			JAM_TOKYO_G(backend) = AwareTokyoBackendTyrant;			
 		} else if (new_value_length == 7 && !strcmp(new_value, "cabinet")) {
-			AWARE_TOKYO_G(backend) = AwareTokyoBackendCabinet;
+			JAM_TOKYO_G(backend) = AwareTokyoBackendCabinet;
 		} else {
-			AWARE_TOKYO_G(backend) = AwareTokyoBackendNotSet;
+			JAM_TOKYO_G(backend) = AwareTokyoBackendNotSet;
 			return FAILURE;
 		}
 	} else {
-		AWARE_TOKYO_G(backend) = AwareTokyoBackendNotSet;
+		JAM_TOKYO_G(backend) = AwareTokyoBackendNotSet;
 	}
 	return OnUpdateString(entry, new_value, new_value_length, mh_arg1, mh_arg2, mh_arg3, stage TSRMLS_CC);
 }
@@ -156,56 +156,56 @@ static zend_bool php_jam_tokyo_init_backend(AwareTokyoBackend configured_backend
 	if (configured_backend == AwareTokyoBackendCabinet) {
 		int ecode;
 		
-		AWARE_TOKYO_G(cabinet) = php_jam_cabinet_init();
+		JAM_TOKYO_G(cabinet) = php_jam_cabinet_init();
 		
-		if (!AWARE_TOKYO_G(cabinet)) {
+		if (!JAM_TOKYO_G(cabinet)) {
 			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to allocate tokyo cabinet handle");
 			return 0;
 		}
 		
-		if (!php_jam_cabinet_open(AWARE_TOKYO_G(cabinet), AWARE_TOKYO_G(cabinet_file), TDBOWRITER|TDBOCREAT)) {
-			ecode = tctdbecode(AWARE_TOKYO_G(cabinet));
-			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to open %s: %s", AWARE_TOKYO_G(cabinet_file), tctdberrmsg(ecode));
+		if (!php_jam_cabinet_open(JAM_TOKYO_G(cabinet), JAM_TOKYO_G(cabinet_file), TDBOWRITER|TDBOCREAT)) {
+			ecode = tctdbecode(JAM_TOKYO_G(cabinet));
+			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to open %s: %s", JAM_TOKYO_G(cabinet_file), tctdberrmsg(ecode));
 			return 0;
 		}
 		
-		if (!php_jam_cabinet_optimize(AWARE_TOKYO_G(cabinet))) {
-			ecode = tctdbecode(AWARE_TOKYO_G(cabinet));
-			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to optimize %s: %s", AWARE_TOKYO_G(cabinet_file), tctdberrmsg(ecode));
+		if (!php_jam_cabinet_optimize(JAM_TOKYO_G(cabinet))) {
+			ecode = tctdbecode(JAM_TOKYO_G(cabinet));
+			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to optimize %s: %s", JAM_TOKYO_G(cabinet_file), tctdberrmsg(ecode));
 			return 0;	
 		}
 		
-		if (!php_jam_cabinet_close(AWARE_TOKYO_G(cabinet))) {
-			ecode = tctdbecode(AWARE_TOKYO_G(cabinet));
-			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to close %s: %s", AWARE_TOKYO_G(cabinet_file), tctdberrmsg(ecode));
+		if (!php_jam_cabinet_close(JAM_TOKYO_G(cabinet))) {
+			ecode = tctdbecode(JAM_TOKYO_G(cabinet));
+			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to close %s: %s", JAM_TOKYO_G(cabinet_file), tctdberrmsg(ecode));
 			return 0;
 		}
 		return 1;
 	} else if (configured_backend == AwareTokyoBackendTyrant) {
 		int ecode;
 		
-		AWARE_TOKYO_G(tyrant) = php_jam_tyrant_init();
+		JAM_TOKYO_G(tyrant) = php_jam_tyrant_init();
 		
-		if (!AWARE_TOKYO_G(tyrant)) {
+		if (!JAM_TOKYO_G(tyrant)) {
 			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to allocate tokyo cabinet handle");
 			return 0;
 		}
 		
-		if (!php_jam_tyrant_open(AWARE_TOKYO_G(tyrant), AWARE_TOKYO_G(tyrant_host), AWARE_TOKYO_G(tyrant_port))) {
-			ecode = tcrdbecode(AWARE_TOKYO_G(tyrant));
-			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to open %s:%d: %s", AWARE_TOKYO_G(tyrant_host), AWARE_TOKYO_G(tyrant_port), tcrdberrmsg(ecode));
+		if (!php_jam_tyrant_open(JAM_TOKYO_G(tyrant), JAM_TOKYO_G(tyrant_host), JAM_TOKYO_G(tyrant_port))) {
+			ecode = tcrdbecode(JAM_TOKYO_G(tyrant));
+			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to open %s:%d: %s", JAM_TOKYO_G(tyrant_host), JAM_TOKYO_G(tyrant_port), tcrdberrmsg(ecode));
 			return 0;
 		}
 		
-		if (!php_jam_tyrant_optimize(AWARE_TOKYO_G(tyrant))) {
-			ecode = tcrdbecode(AWARE_TOKYO_G(tyrant));
-			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to optimize %s:%d: %s", AWARE_TOKYO_G(tyrant_host), AWARE_TOKYO_G(tyrant_port), tcrdberrmsg(ecode));
+		if (!php_jam_tyrant_optimize(JAM_TOKYO_G(tyrant))) {
+			ecode = tcrdbecode(JAM_TOKYO_G(tyrant));
+			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to optimize %s:%d: %s", JAM_TOKYO_G(tyrant_host), JAM_TOKYO_G(tyrant_port), tcrdberrmsg(ecode));
 			return 0;	
 		}
 		
-		if (!php_jam_tyrant_close(AWARE_TOKYO_G(tyrant))) {
-			ecode = tcrdbecode(AWARE_TOKYO_G(tyrant));
-			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to close %s:%d: %s", AWARE_TOKYO_G(tyrant_host), AWARE_TOKYO_G(tyrant_port), tcrdberrmsg(ecode));
+		if (!php_jam_tyrant_close(JAM_TOKYO_G(tyrant))) {
+			ecode = tcrdbecode(JAM_TOKYO_G(tyrant));
+			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to close %s:%d: %s", JAM_TOKYO_G(tyrant_host), JAM_TOKYO_G(tyrant_port), tcrdberrmsg(ecode));
 			return 0;
 		}
 		return 1;
@@ -222,29 +222,29 @@ PHP_MINIT_FUNCTION(jam_tokyo)
 	ZEND_INIT_MODULE_GLOBALS(jam_tokyo, php_jam_tokyo_init_globals, NULL);
 	REGISTER_INI_ENTRIES();
 	
-	status = PHP_AWARE_STORAGE_REGISTER(tokyo);
+	status = PHP_JAM_STORAGE_REGISTER(tokyo);
 	
 	switch (status) 
 	{
 		case AwareModuleRegistered:	
-			if (AWARE_TOKYO_G(backend) == AwareTokyoBackendNotSet) {
+			if (JAM_TOKYO_G(backend) == AwareTokyoBackendNotSet) {
 				php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_tokyo, no jam_tokyo.backend defined");
 				return FAILURE;
 			}
-			if (!php_jam_tokyo_init_backend(AWARE_TOKYO_G(backend) TSRMLS_CC)) {
+			if (!php_jam_tokyo_init_backend(JAM_TOKYO_G(backend) TSRMLS_CC)) {
 				php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Failed to initialize the tokyo backend");
 				return FAILURE;
 			}
-			AWARE_TOKYO_G(enabled) = 1;
+			JAM_TOKYO_G(enabled) = 1;
 		break;
 		
 		case AwareModuleFailed:
-			AWARE_TOKYO_G(enabled) = 0;
+			JAM_TOKYO_G(enabled) = 0;
 			return FAILURE;
 		break;
 
 		case AwareModuleNotConfigured:
-			AWARE_TOKYO_G(enabled) = 0;
+			JAM_TOKYO_G(enabled) = 0;
 		break;	
 	}
 	return SUCCESS;
@@ -256,11 +256,11 @@ PHP_MSHUTDOWN_FUNCTION(jam_tokyo)
 {
 	UNREGISTER_INI_ENTRIES();
 	
-	if (AWARE_TOKYO_G(enabled)) {
-		if (AWARE_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
-			php_jam_cabinet_deinit(AWARE_TOKYO_G(cabinet));
-		} else if (AWARE_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
-			php_jam_tyrant_deinit(AWARE_TOKYO_G(tyrant));
+	if (JAM_TOKYO_G(enabled)) {
+		if (JAM_TOKYO_G(backend) == AwareTokyoBackendCabinet) {
+			php_jam_cabinet_deinit(JAM_TOKYO_G(cabinet));
+		} else if (JAM_TOKYO_G(backend) == AwareTokyoBackendTyrant) {
+			php_jam_tyrant_deinit(JAM_TOKYO_G(tyrant));
 		}
 	}
 	
@@ -274,7 +274,7 @@ PHP_MINFO_FUNCTION(jam_tokyo)
 {	
 	php_info_print_table_start();
 	php_info_print_table_row(2, "jam_tokyo storage", "enabled");
-	php_info_print_table_row(2, "jam_tokyo version", PHP_AWARE_TOKYO_EXTVER);
+	php_info_print_table_row(2, "jam_tokyo version", PHP_JAM_TOKYO_EXTVER);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES(); 
@@ -293,10 +293,10 @@ zend_module_entry jam_tokyo_module_entry = {
         NULL,
         NULL,
         PHP_MINFO(jam_tokyo),
-    	PHP_AWARE_TOKYO_EXTVER,
+    	PHP_JAM_TOKYO_EXTVER,
         STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_AWARE_TOKYO
+#ifdef COMPILE_DL_JAM_TOKYO
 ZEND_GET_MODULE(jam_tokyo)
 #endif

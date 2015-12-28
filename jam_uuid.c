@@ -36,13 +36,13 @@ zend_bool php_jam_generate_uuid(char *buf)
 		return 0;
     }
 
-	if (strlen(uuid_str) > PHP_AWARE_UUID_LEN) {
+	if (strlen(uuid_str) > PHP_JAM_UUID_LEN) {
 		RpcStringFree(&uuid_str);
 		return 0;
 	}
 
-	strncpy(buf, uuid_str, PHP_AWARE_UUID_LEN);
-	buf[PHP_AWARE_UUID_LEN] = '\0';
+	strncpy(buf, uuid_str, PHP_JAM_UUID_LEN);
+	buf[PHP_JAM_UUID_LEN] = '\0';
 	
     RpcStringFree(&uuid_str);
 	return 1;

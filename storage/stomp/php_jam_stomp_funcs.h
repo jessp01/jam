@@ -16,8 +16,8 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_STOMP_FUNCS_H_
-# define _PHP_AWARE_STOMP_FUNCS_H_
+#ifndef _PHP_JAM_STOMP_FUNCS_H_
+# define _PHP_JAM_STOMP_FUNCS_H_
 
 /* {{{ php_jam_stomp_handle */
 typedef struct _php_jam_stomp_handle {

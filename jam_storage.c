@@ -44,11 +44,11 @@ static zend_bool php_jam_storage_module_is_configured(const char *mod_name TSRML
 	char *pch, *last, *ptr;
 	
 	/* If jam is not enabled, don't register anything */
-	if (!AWARE_G(enabled)) {
+	if (!JAM_G(enabled)) {
 		return 0;
 	}
 
-	ptr = estrdup(AWARE_G(storage_modules));
+	ptr = estrdup(JAM_G(storage_modules));
 	pch = php_strtok_r(ptr, ",", &last);
 
 	while (pch != NULL) {
@@ -73,9 +73,9 @@ static zend_bool php_jam_storage_module_is_configured(const char *mod_name TSRML
 }
 /* }}} */
 
-/* {{{ MY_AWARE_EXPORTS AwareModuleRegisterStatus php_jam_register_storage_module(php_jam_storage_module *mod TSRMLS_DC)
+/* {{{ MY_JAM_EXPORTS AwareModuleRegisterStatus php_jam_register_storage_module(php_jam_storage_module *mod TSRMLS_DC)
 */
-MY_AWARE_EXPORTS AwareModuleRegisterStatus php_jam_register_storage_module(php_jam_storage_module *mod TSRMLS_DC)
+MY_JAM_EXPORTS AwareModuleRegisterStatus php_jam_register_storage_module(php_jam_storage_module *mod TSRMLS_DC)
 {
 	int i, ret = AwareModuleFailed;
 	
@@ -132,14 +132,14 @@ void php_jam_storage_module_list(zval *return_value)
 }
 /* }}} */
 
-/* {{{ MY_AWARE_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var TSRMLS_DC)
+/* {{{ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var TSRMLS_DC)
 */
-MY_AWARE_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var TSRMLS_DC)
+MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var TSRMLS_DC)
 {
 	php_serialize_data_t var_hash;
 	
-	if (AWARE_G(use_cache)) {
-		if (php_jam_cache_get(&AWARE_G(s_cache), uuid, data_var)) {
+	if (JAM_G(use_cache)) {
+		if (php_jam_cache_get(&JAM_G(s_cache), uuid, data_var)) {
 			return;
 		}
 	}
@@ -148,15 +148,15 @@ MY_AWARE_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, s
 	php_var_serialize(data_var, &event, &var_hash TSRMLS_CC);
     PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
-	if (AWARE_G(use_cache)) {
-		php_jam_cache_store(&AWARE_G(s_cache), uuid, data_var);
+	if (JAM_G(use_cache)) {
+		php_jam_cache_store(&JAM_G(s_cache), uuid, data_var);
 	}
 }
 /* }}} */
 
-/* {{{ MY_AWARE_EXPORTS zend_bool php_jam_storage_unserialize(const char *string, int string_len, zval *retval TSRMLS_DC)
+/* {{{ MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *string, int string_len, zval *retval TSRMLS_DC)
 */
-MY_AWARE_EXPORTS zend_bool php_jam_storage_unserialize(const char *string, int string_len, zval *retval TSRMLS_DC)
+MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *string, int string_len, zval *retval TSRMLS_DC)
 {
 	zend_bool unserialized;
 	php_unserialize_data_t var_hash;
@@ -181,10 +181,10 @@ void php_jam_storage_store(php_jam_storage_module *mod, const char *uuid, zval *
 		This means that we need to check here if the module is configured to 
 		store events of this level. 
 	*/
-	if (zend_hash_num_elements(&AWARE_G(module_error_reporting)) > 0) {
+	if (zend_hash_num_elements(&JAM_G(module_error_reporting)) > 0) {
 		long **level;
 		/* This means that we might have overriden error reporting level */
-		if (zend_hash_find(&AWARE_G(module_error_reporting), mod->name, strlen(mod->name) + 1, (void **)&level) == SUCCESS) {
+		if (zend_hash_find(&JAM_G(module_error_reporting), mod->name, strlen(mod->name) + 1, (void **)&level) == SUCCESS) {
 			/* Check if module is configured for this sort of errors */
 			if (!(**level & type)) {
 				return;
@@ -198,7 +198,7 @@ void php_jam_storage_store(php_jam_storage_module *mod, const char *uuid, zval *
 		return;
 	}
 	
-	if (mod->store(uuid, event, error_filename, error_lineno TSRMLS_CC,type,AWARE_G(appname),AWARE_G(source_baseurl)) == AwareOperationFailed) {
+	if (mod->store(uuid, event, error_filename, error_lineno TSRMLS_CC,type,JAM_G(appname),JAM_G(source_baseurl)) == AwareOperationFailed) {
 		php_jam_original_error_cb(E_WARNING TSRMLS_CC, "Failed to store the event %s (%s)", uuid, mod->name);
 	}
 

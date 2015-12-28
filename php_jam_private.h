@@ -16,8 +16,8 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_PRIVATE_H_
-# define _PHP_AWARE_PRIVATE_H_
+#ifndef _PHP_JAM_PRIVATE_H_
+# define _PHP_JAM_PRIVATE_H_
 
 /* for HAVE_GETTIMEOFDAY */
 #ifdef PHP_WIN32

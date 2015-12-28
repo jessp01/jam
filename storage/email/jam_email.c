@@ -26,20 +26,20 @@
 ZEND_DECLARE_MODULE_GLOBALS(jam_email)
 
 php_jam_storage_module php_jam_storage_module_email = {
-	PHP_AWARE_STORAGE_MOD(email)
+	PHP_JAM_STORAGE_MOD(email)
 };
 
-PHP_AWARE_CONNECT_FUNC(email)
+PHP_JAM_CONNECT_FUNC(email)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_GET_FUNC(email)
+PHP_JAM_GET_FUNC(email)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_STORE_FUNC(email)
+PHP_JAM_STORE_FUNC(email)
 {
 	zval *fname, *args[3], *retval, **ppzval;
 
@@ -52,7 +52,7 @@ PHP_AWARE_STORE_FUNC(email)
 #else
 	php_output_start_user(NULL, 4096, PHP_OUTPUT_HANDLER_STDFLAGS);
 #endif
-	php_var_dump(&event, AWARE_G(depth) TSRMLS_CC);
+	php_var_dump(&event, JAM_G(depth) TSRMLS_CC);
 
 #if ZEND_MODULE_API_NO <= PHP_5_3_X_API_NO
 	if (php_ob_get_buffer(args[2] TSRMLS_CC) == FAILURE) {
@@ -83,7 +83,7 @@ PHP_AWARE_STORE_FUNC(email)
 		Recipient
 	*/
 	MAKE_STD_ZVAL(args[0]);
-	ZVAL_STRING(args[0], AWARE_EMAIL_G(to_address), 1);
+	ZVAL_STRING(args[0], JAM_EMAIL_G(to_address), 1);
 
 	/*
 		Subject
@@ -117,17 +117,17 @@ PHP_AWARE_STORE_FUNC(email)
 	return AwareOperationSuccess;
 }
 
-PHP_AWARE_GET_LIST_FUNC(email)
+PHP_JAM_GET_LIST_FUNC(email)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DELETE_FUNC(email)
+PHP_JAM_DELETE_FUNC(email)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DISCONNECT_FUNC(email)
+PHP_JAM_DISCONNECT_FUNC(email)
 {
 	return AwareOperationNotSupported;
 }
@@ -149,12 +149,12 @@ PHP_MINIT_FUNCTION(jam_email)
 	ZEND_INIT_MODULE_GLOBALS(jam_email, php_jam_email_init_globals, NULL);
 	REGISTER_INI_ENTRIES();
 	
-	reg_status = PHP_AWARE_STORAGE_REGISTER(email);
+	reg_status = PHP_JAM_STORAGE_REGISTER(email);
 	
 	switch (reg_status) 
 	{
 		case AwareModuleRegistered:
-			if (!AWARE_EMAIL_G(to_address)) {
+			if (!JAM_EMAIL_G(to_address)) {
 				php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_email, missing jam_email.to_address");
 				return FAILURE;
 			}
@@ -186,7 +186,7 @@ PHP_MINFO_FUNCTION(jam_email)
 {	
 	php_info_print_table_start();
 	php_info_print_table_row(2, "jam_email storage", "enabled");
-	php_info_print_table_row(2, "jam_email version", PHP_AWARE_EMAIL_EXTVER);
+	php_info_print_table_row(2, "jam_email version", PHP_JAM_EMAIL_EXTVER);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES(); 
@@ -205,10 +205,10 @@ zend_module_entry jam_email_module_entry = {
         NULL,
         NULL,
         PHP_MINFO(jam_email),
-    	PHP_AWARE_EMAIL_EXTVER,
+    	PHP_JAM_EMAIL_EXTVER,
         STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_AWARE_EMAIL
+#ifdef COMPILE_DL_JAM_EMAIL
 ZEND_GET_MODULE(jam_email)
 #endif

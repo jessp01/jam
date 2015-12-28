@@ -16,10 +16,10 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_SKELETON_H_
-# define _PHP_AWARE_SKELETON_H_
+#ifndef _PHP_JAM_SKELETON_H_
+# define _PHP_JAM_SKELETON_H_
 
-#define PHP_AWARE_SKELETON_EXTVER "0.0.1-dev"
+#define PHP_JAM_SKELETON_EXTVER "0.0.1-dev"
 
 #include "php.h"
 #include "php_ini.h"
@@ -43,9 +43,9 @@ ZEND_END_MODULE_GLOBALS(jam_skeleton)
 ZEND_EXTERN_MODULE_GLOBALS(jam_skeleton)
 
 #ifdef ZTS
-# define AWARE_SKELETON_G(v) TSRMG(jam_skeleton_globals_id, zend_jam_skeleton_globals *, v)
+# define JAM_SKELETON_G(v) TSRMG(jam_skeleton_globals_id, zend_jam_skeleton_globals *, v)
 #else
-# define AWARE_SKELETON_G(v) (jam_skeleton_globals.v)
+# define JAM_SKELETON_G(v) (jam_skeleton_globals.v)
 #endif
 
 /* Hook into jam module */
@@ -56,6 +56,6 @@ extern php_jam_storage_module php_jam_storage_module_skeleton;
 extern zend_module_entry jam_skeleton_module_entry;
 #define phpext_jam_skeleton_ptr &jam_skeleton_module_entry
 
-PHP_AWARE_STORAGE_FUNCS(skeleton);
+PHP_JAM_STORAGE_FUNCS(skeleton);
 
 #endif

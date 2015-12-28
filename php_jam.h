@@ -16,8 +16,8 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_H_
-# define _PHP_AWARE_H_
+#ifndef _PHP_JAM_H_
+# define _PHP_JAM_H_
 
 #include "php.h"
 
@@ -33,7 +33,7 @@
 #include "ext/standard/info.h"
 #include "ext/standard/php_smart_str.h"
 
-#define PHP_AWARE_EXTVER "0.1.0-dev"
+#define PHP_JAM_EXTVER "0.1.0-dev"
 
 #include <sys/resource.h>
 
@@ -105,15 +105,15 @@ ZEND_END_MODULE_GLOBALS(jam)
 ZEND_EXTERN_MODULE_GLOBALS(jam)
 
 #ifdef ZTS
-#  define AWARE_G(v) TSRMG(jam_globals_id, zend_jam_globals *, v)
+#  define JAM_G(v) TSRMG(jam_globals_id, zend_jam_globals *, v)
 #else
-#  define AWARE_G(v) (jam_globals.v)
+#  define JAM_G(v) (jam_globals.v)
 #endif
 
 extern zend_module_entry jam_module_entry;
 #define phpext_jam_ptr &jam_module_entry
 
-#ifdef _AWARE_DEBUG_
+#ifdef _JAM_DEBUG_
 #  define jam_printf(...) fprintf (stderr, __VA_ARGS__)
 #else
 #  define jam_printf(...)
@@ -122,14 +122,14 @@ extern zend_module_entry jam_module_entry;
 /*
 	API exports
 */
-#ifndef MY_AWARE_EXPORTS
+#ifndef MY_JAM_EXPORTS
 #  ifdef PHP_WIN32
-#    define MY_AWARE_EXPORTS __declspec(dllexport)
+#    define MY_JAM_EXPORTS __declspec(dllexport)
 #  else
-#    define MY_AWARE_EXPORTS PHPAPI
+#    define MY_JAM_EXPORTS PHPAPI
 #  endif
 #endif
 
-MY_AWARE_EXPORTS void php_jam_original_error_cb(int type TSRMLS_DC, const char *format, ...);
+MY_JAM_EXPORTS void php_jam_original_error_cb(int type TSRMLS_DC, const char *format, ...);
 
 #endif

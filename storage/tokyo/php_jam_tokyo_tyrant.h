@@ -16,8 +16,8 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_TOKYO_TYRANT_H_
-# define _PHP_AWARE_TOKYO_TYRANT_H_
+#ifndef _PHP_JAM_TOKYO_TYRANT_H_
+# define _PHP_JAM_TOKYO_TYRANT_H_
 
 #include <tcrdb.h>
 

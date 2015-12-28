@@ -22,22 +22,22 @@
 ZEND_DECLARE_MODULE_GLOBALS(jam_files)
 
 php_jam_storage_module php_jam_storage_module_files = {
-	PHP_AWARE_STORAGE_MOD(files)
+	PHP_JAM_STORAGE_MOD(files)
 };
 
-PHP_AWARE_CONNECT_FUNC(files)
+PHP_JAM_CONNECT_FUNC(files)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_GET_FUNC(files)
+PHP_JAM_GET_FUNC(files)
 {
 	char filename[MAXPATHLEN], *buff;
 	php_stream *stream;
 	size_t buff_size;
 	zend_bool status;
 
-	if (snprintf(filename, MAXPATHLEN, "%s/%s.jam", AWARE_FILES_G(storage_path), uuid) <= 0) {
+	if (snprintf(filename, MAXPATHLEN, "%s/%s.jam", JAM_FILES_G(storage_path), uuid) <= 0) {
 		return AwareOperationFailed;
 	}
 	
@@ -65,13 +65,13 @@ PHP_AWARE_GET_FUNC(files)
 	return AwareOperationSuccess;
 }
 
-PHP_AWARE_STORE_FUNC(files)
+PHP_JAM_STORE_FUNC(files)
 {
 	char filename[MAXPATHLEN];
 	php_stream *stream;
 	smart_str string = {0};
 
-	if (snprintf(filename, MAXPATHLEN, "%s/%s.jam", AWARE_FILES_G(storage_path), uuid) <= 0) {
+	if (snprintf(filename, MAXPATHLEN, "%s/%s.jam", JAM_FILES_G(storage_path), uuid) <= 0) {
 		return AwareOperationFailed;
 	}
 	
@@ -100,14 +100,14 @@ PHP_AWARE_STORE_FUNC(files)
 /* Just the uuid part of the full path */
 static int _php_jam_files_clean_path(zval **path TSRMLS_DC)
 {
-	if (Z_TYPE_PP(path) == IS_STRING && Z_STRLEN_PP(path) > PHP_AWARE_UUID_LEN) {
-		char *ptr, buffer[PHP_AWARE_UUID_LEN + 1];
-		memset(buffer, 0, PHP_AWARE_UUID_LEN + 1);
+	if (Z_TYPE_PP(path) == IS_STRING && Z_STRLEN_PP(path) > PHP_JAM_UUID_LEN) {
+		char *ptr, buffer[PHP_JAM_UUID_LEN + 1];
+		memset(buffer, 0, PHP_JAM_UUID_LEN + 1);
 		
 		ptr = Z_STRVAL_PP(path) + (Z_STRLEN_PP(path) - 42);
-		memcpy(buffer, ptr, PHP_AWARE_UUID_LEN);
+		memcpy(buffer, ptr, PHP_JAM_UUID_LEN);
 		
-		buffer[PHP_AWARE_UUID_LEN] = '\0';
+		buffer[PHP_JAM_UUID_LEN] = '\0';
 		efree(Z_STRVAL_PP(path));
 		ZVAL_STRING(*path, buffer, 1);
 		
@@ -148,7 +148,7 @@ static int php_jam_sort_mtime(const void *a, const void *b TSRMLS_DC) /* {{{ */
 	return result;
 }
 
-PHP_AWARE_GET_LIST_FUNC(files)
+PHP_JAM_GET_LIST_FUNC(files)
 {
 	char path[MAXPATHLEN];
 	zval *fname;
@@ -159,7 +159,7 @@ PHP_AWARE_GET_LIST_FUNC(files)
 	ZVAL_STRING(fname, "glob", 1);
 
 	MAKE_STD_ZVAL(args[0]);
-	snprintf(path, MAXPATHLEN, "%s/*-*-*-*-*.jam", AWARE_FILES_G(storage_path));
+	snprintf(path, MAXPATHLEN, "%s/*-*-*-*-*.jam", JAM_FILES_G(storage_path));
 	
 	ZVAL_STRING(args[0], path, 1);
 
@@ -212,14 +212,14 @@ PHP_AWARE_GET_LIST_FUNC(files)
 	return AwareOperationSuccess;
 }
 
-PHP_AWARE_DELETE_FUNC(files)
+PHP_JAM_DELETE_FUNC(files)
 {
 	AwareOperationStatus status;
 	char path[MAXPATHLEN];
 	int path_len;
 	zval *stat;
 
-	path_len = snprintf(path, MAXPATHLEN, "%s/%s.jam", AWARE_FILES_G(storage_path), uuid);
+	path_len = snprintf(path, MAXPATHLEN, "%s/%s.jam", JAM_FILES_G(storage_path), uuid);
 	
 	MAKE_STD_ZVAL(stat);
 	php_stat(path, path_len, FS_IS_FILE, stat TSRMLS_CC);
@@ -234,7 +234,7 @@ PHP_AWARE_DELETE_FUNC(files)
 	return status;
 }
 
-PHP_AWARE_DISCONNECT_FUNC(files)
+PHP_JAM_DISCONNECT_FUNC(files)
 {
 	return AwareOperationNotSupported;
 }
@@ -254,10 +254,10 @@ static zend_bool php_jam_files_startup_check(TSRMLS_D)
 	zend_bool retval = 1;
 
 	MAKE_STD_ZVAL(stat);
-	php_stat(AWARE_FILES_G(storage_path), strlen(AWARE_FILES_G(storage_path)), FS_IS_DIR, stat TSRMLS_CC);
+	php_stat(JAM_FILES_G(storage_path), strlen(JAM_FILES_G(storage_path)), FS_IS_DIR, stat TSRMLS_CC);
 
 	if (Z_TYPE_P(stat) != IS_BOOL || !Z_BVAL_P(stat)) {
-		php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_files. %s is not a directory", AWARE_FILES_G(storage_path));
+		php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_files. %s is not a directory", JAM_FILES_G(storage_path));
 		retval = 0;
 	}
 	zval_dtor(stat);
@@ -273,7 +273,7 @@ PHP_MINIT_FUNCTION(jam_files)
 	ZEND_INIT_MODULE_GLOBALS(jam_files, php_jam_files_init_globals, NULL);
 	REGISTER_INI_ENTRIES();
 	
-	reg_status = PHP_AWARE_STORAGE_REGISTER(files);
+	reg_status = PHP_JAM_STORAGE_REGISTER(files);
 
 	switch (reg_status) 
 	{
@@ -310,7 +310,7 @@ PHP_MINFO_FUNCTION(jam_files)
 {	
 	php_info_print_table_start();
 	php_info_print_table_row(2, "jam_files storage", "enabled");
-	php_info_print_table_row(2, "jam_files version", PHP_AWARE_FILES_EXTVER);
+	php_info_print_table_row(2, "jam_files version", PHP_JAM_FILES_EXTVER);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES(); 
@@ -329,10 +329,10 @@ zend_module_entry jam_files_module_entry = {
         NULL,
         NULL,
         PHP_MINFO(jam_files),
-    	PHP_AWARE_FILES_EXTVER,
+    	PHP_JAM_FILES_EXTVER,
         STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_AWARE_FILES
+#ifdef COMPILE_DL_JAM_FILES
 ZEND_GET_MODULE(jam_files)
 #endif

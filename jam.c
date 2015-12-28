@@ -48,13 +48,13 @@ PHP_FUNCTION(jam_event_trigger)
 		return;
 	}
 	
-	if (!AWARE_G(enable_event_trigger))
+	if (!JAM_G(enable_event_trigger))
 		RETURN_FALSE;
 
 	error_filename = zend_get_executed_filename(TSRMLS_C);
 	error_lineno   = zend_get_executed_lineno(TSRMLS_C);
 	
-	if (type & AWARE_G(log_level)) {
+	if (type & JAM_G(log_level)) {
 		php_jam_user_event_trigger(type TSRMLS_CC, error_filename, error_lineno, message);
 		RETURN_TRUE;
 	}
@@ -136,24 +136,24 @@ PHP_FUNCTION(jam_storage_module_list)
 */
 PHP_FUNCTION(__jam_error_handler_callback)
 {
-	if (AWARE_G(user_error_handler)) {
+	if (JAM_G(user_error_handler)) {
 		zval *args[5], retval;
 	
 		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz|zzz", &args[0], &args[1], &args[2], &args[3], &args[4]) != SUCCESS) {
 			return;
 		}
 		
-		jam_printf("Invoking error handler: %s\n", Z_STRVAL_P(AWARE_G(user_error_handler)));
+		jam_printf("Invoking error handler: %s\n", Z_STRVAL_P(JAM_G(user_error_handler)));
 		php_jam_invoke_handler(Z_LVAL_P(args[0]) TSRMLS_CC, Z_STRVAL_P(args[2]), Z_LVAL_P(args[3]), Z_STRVAL_P(args[1]));
-		call_user_function(EG(function_table), NULL, AWARE_G(user_error_handler), &retval, 5, args TSRMLS_CC);
+		call_user_function(EG(function_table), NULL, JAM_G(user_error_handler), &retval, 5, args TSRMLS_CC);
 	}
 }
 /* }}} */
 
 PHP_FUNCTION(jam_set_error_handler)
 {
-	if (AWARE_G(orig_set_error_handler)) {
-		AWARE_G(orig_set_error_handler)(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+	if (JAM_G(orig_set_error_handler)) {
+		JAM_G(orig_set_error_handler)(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
 		/* Take the user error handler and push to our stack */
 		if (EG(user_error_handler)) {
@@ -164,9 +164,9 @@ PHP_FUNCTION(jam_set_error_handler)
 				php_error_docref(NULL TSRMLS_CC, E_ERROR, "Do not call set_error_handler(\"__jam_error_handler_callback\")");
 			}
 			
-			if (zend_ptr_stack_num_elements(&AWARE_G(user_error_handlers)) > 0) {
-				zval *old_handler = (zval *)zend_ptr_stack_pop(&AWARE_G(user_error_handlers));
-				zend_ptr_stack_push(&AWARE_G(user_error_handlers), old_handler);
+			if (zend_ptr_stack_num_elements(&JAM_G(user_error_handlers)) > 0) {
+				zval *old_handler = (zval *)zend_ptr_stack_pop(&JAM_G(user_error_handlers));
+				zend_ptr_stack_push(&JAM_G(user_error_handlers), old_handler);
 			
 				zval_dtor(return_value);
 				ZVAL_STRING(return_value, Z_STRVAL_P(old_handler), 1);
@@ -176,55 +176,55 @@ PHP_FUNCTION(jam_set_error_handler)
 			ZVAL_STRING(tmp, Z_STRVAL_P(EG(user_error_handler)), 1);
 
 			/* free previous error handler */
-			if (AWARE_G(user_error_handler)) {
-				//zval_ptr_dtor(&AWARE_G(user_error_handler));
-				//FREE_ZVAL(AWARE_G(user_error_handler));
+			if (JAM_G(user_error_handler)) {
+				//zval_ptr_dtor(&JAM_G(user_error_handler));
+				//FREE_ZVAL(JAM_G(user_error_handler));
 			}
 			
-			ALLOC_INIT_ZVAL(AWARE_G(user_error_handler));
-			ZVAL_STRING(AWARE_G(user_error_handler), Z_STRVAL_P(EG(user_error_handler)), 1);
+			ALLOC_INIT_ZVAL(JAM_G(user_error_handler));
+			ZVAL_STRING(JAM_G(user_error_handler), Z_STRVAL_P(EG(user_error_handler)), 1);
 
 			/* Create a new handler */
-			zend_ptr_stack_push(&AWARE_G(user_error_handlers), tmp);
+			zend_ptr_stack_push(&JAM_G(user_error_handlers), tmp);
 
 			zval_dtor(EG(user_error_handler));
 			ZVAL_STRING(EG(user_error_handler), "__jam_error_handler_callback", 1);
 		} else {
-			zval_ptr_dtor(&AWARE_G(user_error_handler));
-			FREE_ZVAL(AWARE_G(user_error_handler));
-			AWARE_G(user_error_handler) = NULL;
+			zval_ptr_dtor(&JAM_G(user_error_handler));
+			FREE_ZVAL(JAM_G(user_error_handler));
+			JAM_G(user_error_handler) = NULL;
 		}
 	}
 }
 
 PHP_FUNCTION(jam_restore_error_handler)
 {
-	if (AWARE_G(orig_restore_error_handler)) {
-		AWARE_G(orig_restore_error_handler)(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+	if (JAM_G(orig_restore_error_handler)) {
+		JAM_G(orig_restore_error_handler)(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
-		if (AWARE_G(user_error_handler)) {
-			zval_ptr_dtor(&AWARE_G(user_error_handler));
-			//FREE_ZVAL(AWARE_G(user_error_handler));
-			AWARE_G(user_error_handler) = NULL;
+		if (JAM_G(user_error_handler)) {
+			zval_ptr_dtor(&JAM_G(user_error_handler));
+			//FREE_ZVAL(JAM_G(user_error_handler));
+			JAM_G(user_error_handler) = NULL;
 		}
 
 		/* Delete the top element from our stack */
-		if (zend_ptr_stack_num_elements(&AWARE_G(user_error_handlers)) > 0) {
-			zval *tmp = (zval *)zend_ptr_stack_pop(&AWARE_G(user_error_handlers));
+		if (zend_ptr_stack_num_elements(&JAM_G(user_error_handlers)) > 0) {
+			zval *tmp = (zval *)zend_ptr_stack_pop(&JAM_G(user_error_handlers));
 			zval_dtor(tmp);
 			FREE_ZVAL(tmp);
 			tmp = NULL;
 			
-			if (zend_ptr_stack_num_elements(&AWARE_G(user_error_handlers)) > 0) {
-				tmp = (zval *)zend_ptr_stack_pop(&AWARE_G(user_error_handlers));
-				zend_ptr_stack_push(&AWARE_G(user_error_handlers), tmp);
+			if (zend_ptr_stack_num_elements(&JAM_G(user_error_handlers)) > 0) {
+				tmp = (zval *)zend_ptr_stack_pop(&JAM_G(user_error_handlers));
+				zend_ptr_stack_push(&JAM_G(user_error_handlers), tmp);
 				
-				if (AWARE_G(user_error_handler)) {
-					zval_ptr_dtor(&AWARE_G(user_error_handler));
-					//FREE_ZVAL(AWARE_G(user_error_handler));
+				if (JAM_G(user_error_handler)) {
+					zval_ptr_dtor(&JAM_G(user_error_handler));
+					//FREE_ZVAL(JAM_G(user_error_handler));
 				}
-				ALLOC_INIT_ZVAL(AWARE_G(user_error_handler));
-				ZVAL_STRING(AWARE_G(user_error_handler), Z_STRVAL_P(tmp), 1);
+				ALLOC_INIT_ZVAL(JAM_G(user_error_handler));
+				ZVAL_STRING(JAM_G(user_error_handler), Z_STRVAL_P(tmp), 1);
 			}
 		}
 	}
@@ -252,7 +252,7 @@ void php_jam_capture_error_ex(zval *event, int type, const char *error_filename,
 	va_list args_cp;
 	int len;
 	char *buffer;
-	char uuid_str[PHP_AWARE_UUID_LEN + 1];
+	char uuid_str[PHP_JAM_UUID_LEN + 1];
 	
 	TSRMLS_FETCH();
 	
@@ -263,36 +263,36 @@ void php_jam_capture_error_ex(zval *event, int type, const char *error_filename,
 	}
 
 	/* Capture superglobals */
-	if (AWARE_G(log_get)) {
+	if (JAM_G(log_get)) {
 		_add_assoc_zval_helper(event, "_GET", sizeof("_GET") TSRMLS_CC);
 	}
 	
-	if (AWARE_G(log_post)) {
+	if (JAM_G(log_post)) {
 		_add_assoc_zval_helper(event, "_POST", sizeof("_POST") TSRMLS_CC);
 	}
 	
-	if (AWARE_G(log_cookie)) {
+	if (JAM_G(log_cookie)) {
 		_add_assoc_zval_helper(event, "_COOKIE", sizeof("_COOKIE") TSRMLS_CC);
 	}
 	
-	if (AWARE_G(log_session)) {
+	if (JAM_G(log_session)) {
 		_add_assoc_zval_helper(event, "_SESSION", sizeof("_SESSION") TSRMLS_CC);
 	}
 	
-	if (AWARE_G(log_server)) {
+	if (JAM_G(log_server)) {
 		_add_assoc_zval_helper(event, "_SERVER", sizeof("_SERVER") TSRMLS_CC);
 	}
 	
-	if (AWARE_G(log_env)) {
+	if (JAM_G(log_env)) {
 		_add_assoc_zval_helper(event, "_ENV", sizeof("_ENV") TSRMLS_CC);
 	}
 	
-	if (AWARE_G(log_files)) {
+	if (JAM_G(log_files)) {
 		_add_assoc_zval_helper(event, "_FILES", sizeof("_FILES") TSRMLS_CC);
 	}
 	
 	/* Capture backtrace */
-	if (AWARE_G(log_backtrace)) {
+	if (JAM_G(log_backtrace)) {
 		zval *btrace;
 		ALLOC_INIT_ZVAL(btrace);
 #if PHP_API_VERSION <= PHP_5_3_X_API_NO
@@ -388,27 +388,27 @@ void php_jam_capture_error(int type, const char *error_filename, const uint erro
 	TSRMLS_FETCH();
 	
 	/* Assume that display_errors if off */
-	if (!PG(display_errors) && AWARE_G(error_page)) {
+	if (!PG(display_errors) && JAM_G(error_page)) {
 		if (type & E_PARSE || type & E_ERROR || type & E_COMPILE_ERROR || type & E_USER_ERROR) {
-			php_jam_display_error_page(AWARE_G(error_page));
+			php_jam_display_error_page(JAM_G(error_page));
 		}
 	}
 	
-	if (type & AWARE_G(log_level)) {
+	if (type & JAM_G(log_level)) {
 		zval *event;
 
 		ALLOC_INIT_ZVAL(event);
 		array_init(event);
 
 		php_jam_capture_error_ex(event, type, error_filename, error_lineno, 1, format, args TSRMLS_CC);
-		AWARE_G(orig_error_cb)(type, error_filename, error_lineno, format, args);
+		JAM_G(orig_error_cb)(type, error_filename, error_lineno, format, args);
 	} else {
-		AWARE_G(orig_error_cb)(type, error_filename, error_lineno, format, args);	
+		JAM_G(orig_error_cb)(type, error_filename, error_lineno, format, args);	
 	}
 }
 
 /* Aware internal errors go through here */
-MY_AWARE_EXPORTS void php_jam_original_error_cb(int type TSRMLS_DC, const char *format, ...)
+MY_JAM_EXPORTS void php_jam_original_error_cb(int type TSRMLS_DC, const char *format, ...)
 {
 	const char *error_filename;
 	int error_lineno = 0;
@@ -419,8 +419,8 @@ MY_AWARE_EXPORTS void php_jam_original_error_cb(int type TSRMLS_DC, const char *
 
 	va_start(args, format);
 	
-	if (AWARE_G(orig_error_cb)) {
-		AWARE_G(orig_error_cb)(type, error_filename, error_lineno, format, args);
+	if (JAM_G(orig_error_cb)) {
+		JAM_G(orig_error_cb)(type, error_filename, error_lineno, format, args);
 	} else {
 		zend_error_cb(type, error_filename, error_lineno, format, args);
 	}
@@ -432,12 +432,12 @@ static PHP_INI_MH(OnUpdateLogLevel)
 {	
 	if (!new_value) {
 #if PHP_MAJOR_VERSION >= 5 && PHP_MINOR_VERSION >= 3
-		AWARE_G(log_level) = E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED;
+		JAM_G(log_level) = E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED;
 #else 
-		AWARE_G(log_level) = E_ALL & ~E_NOTICE & ~E_STRICT;
+		JAM_G(log_level) = E_ALL & ~E_NOTICE & ~E_STRICT;
 #endif
 	} else {
-		AWARE_G(log_level) = atoi(new_value);
+		JAM_G(log_level) = atoi(new_value);
 	}
 	return SUCCESS;
 }
@@ -455,7 +455,7 @@ void php_jam_ini_parser_cb(zval *arg1, zval *arg2, zval *arg3, int callback_type
 	level    = malloc(sizeof(long));
 	*level   = atol(Z_STRVAL_P(arg2));
 
-	if (zend_hash_update(&AWARE_G(module_error_reporting), mod_name, strlen(mod_name) + 1, &level, sizeof(long), NULL) == FAILURE) {
+	if (zend_hash_update(&JAM_G(module_error_reporting), mod_name, strlen(mod_name) + 1, &level, sizeof(long), NULL) == FAILURE) {
 		free(level);
 	}
 }
@@ -465,7 +465,7 @@ static PHP_INI_MH(OnUpdateModuleErrorReporting)
 	int retval = SUCCESS;
 	char *pch, *copy, *tok_buf;
 	
-	zend_hash_clean(&AWARE_G(module_error_reporting));
+	zend_hash_clean(&JAM_G(module_error_reporting));
 	
 	if (!new_value || new_value_length == 0) {
 		return retval;
@@ -583,29 +583,29 @@ static void php_jam_override_error_handling(TSRMLS_D)
 {
 	zend_function *orig_set_error_handler, *orig_restore_error_handler;
 	
-	AWARE_G(orig_error_cb) = zend_error_cb;
+	JAM_G(orig_error_cb) = zend_error_cb;
 	zend_error_cb          =& php_jam_capture_error;
 	
 	if (zend_hash_find(EG(function_table), "set_error_handler", sizeof("set_error_handler"), (void **)&orig_set_error_handler) == SUCCESS) {
-		AWARE_G(orig_set_error_handler) = orig_set_error_handler->internal_function.handler;
+		JAM_G(orig_set_error_handler) = orig_set_error_handler->internal_function.handler;
 		orig_set_error_handler->internal_function.handler = zif_jam_set_error_handler;
 	}
 	if (zend_hash_find(EG(function_table), "restore_error_handler", sizeof("restore_error_handler"), (void **)&orig_restore_error_handler) == SUCCESS) {
-		AWARE_G(orig_restore_error_handler) = orig_restore_error_handler->internal_function.handler;
+		JAM_G(orig_restore_error_handler) = orig_restore_error_handler->internal_function.handler;
 		orig_restore_error_handler->internal_function.handler = zif_jam_restore_error_handler;
 	}
-	zend_ptr_stack_init(&AWARE_G(user_error_handlers));
+	zend_ptr_stack_init(&JAM_G(user_error_handlers));
 }
 
 PHP_RINIT_FUNCTION(jam)
 {
-	if (AWARE_G(enabled)) {
+	if (JAM_G(enabled)) {
 		php_jam_override_error_handling(TSRMLS_C);
 
 #ifdef HAVE_GETTIMEOFDAY	
-		if (AWARE_G(slow_request_threshold)) {
-			if (!php_jam_init_slow_request_monitor(&AWARE_G(request_start_tv), &(AWARE_G(request_start_rusage)))) {
-				AWARE_G(slow_request_threshold) = 0;
+		if (JAM_G(slow_request_threshold)) {
+			if (!php_jam_init_slow_request_monitor(&JAM_G(request_start_tv), &(JAM_G(request_start_rusage)))) {
+				JAM_G(slow_request_threshold) = 0;
 			}
 		}
 #endif
@@ -617,34 +617,34 @@ static void php_jam_restore_error_handling(TSRMLS_D)
 {
 	zend_function *orig_set_error_handler, *orig_restore_error_handler;
 	
-	zend_error_cb = AWARE_G(orig_error_cb);
-	zend_ptr_stack_clean(&AWARE_G(user_error_handlers), ZVAL_DESTRUCTOR, 1);
-	zend_ptr_stack_destroy(&AWARE_G(user_error_handlers));
+	zend_error_cb = JAM_G(orig_error_cb);
+	zend_ptr_stack_clean(&JAM_G(user_error_handlers), ZVAL_DESTRUCTOR, 1);
+	zend_ptr_stack_destroy(&JAM_G(user_error_handlers));
 	
-	if (AWARE_G(user_error_handler)) {
-		//zval_dtor(AWARE_G(user_error_handler));
-		//zval_ptr_dtor(&AWARE_G(user_error_handler));
-		//FREE_ZVAL(AWARE_G(user_error_handler));
+	if (JAM_G(user_error_handler)) {
+		//zval_dtor(JAM_G(user_error_handler));
+		//zval_ptr_dtor(&JAM_G(user_error_handler));
+		//FREE_ZVAL(JAM_G(user_error_handler));
 	}
 	
 	if (zend_hash_find(EG(function_table), "set_error_handler", sizeof("set_error_handler"), (void **)&orig_set_error_handler) == SUCCESS) {
-		orig_set_error_handler->internal_function.handler = AWARE_G(orig_set_error_handler);
+		orig_set_error_handler->internal_function.handler = JAM_G(orig_set_error_handler);
 	}
 	if (zend_hash_find(EG(function_table), "restore_error_handler", sizeof("restore_error_handler"), (void **)&orig_restore_error_handler) == SUCCESS) {
-		orig_restore_error_handler->internal_function.handler = AWARE_G(orig_restore_error_handler);
+		orig_restore_error_handler->internal_function.handler = JAM_G(orig_restore_error_handler);
 	}
 }
 
 PHP_RSHUTDOWN_FUNCTION(jam)
 {
-	if (AWARE_G(enabled)) {
+	if (JAM_G(enabled)) {
 #ifdef HAVE_GETTIMEOFDAY	
-		if (AWARE_G(slow_request_threshold)) {
-			php_jam_monitor_slow_request(&AWARE_G(request_start_tv), &AWARE_G(request_start_rusage), AWARE_G(slow_request_threshold));
+		if (JAM_G(slow_request_threshold)) {
+			php_jam_monitor_slow_request(&JAM_G(request_start_tv), &JAM_G(request_start_rusage), JAM_G(slow_request_threshold));
 		}
 #endif
-		if (AWARE_G(memory_usage_threshold)) {
-			php_jam_monitor_memory_usage(AWARE_G(memory_usage_threshold) TSRMLS_CC);
+		if (JAM_G(memory_usage_threshold)) {
+			php_jam_monitor_memory_usage(JAM_G(memory_usage_threshold) TSRMLS_CC);
 		}
 		/* restore error handler */
 		php_jam_restore_error_handling(TSRMLS_C);
@@ -683,8 +683,8 @@ PHP_MINIT_FUNCTION(jam)
 {
 	REGISTER_INI_ENTRIES();
 	
-	if (!AWARE_G(storage_modules)) {
-		AWARE_G(enabled) = 0;
+	if (!JAM_G(storage_modules)) {
+		JAM_G(enabled) = 0;
 	}
 	return SUCCESS;
 }
@@ -704,7 +704,7 @@ PHP_MINFO_FUNCTION(jam)
 {	
 	php_info_print_table_start();
 	php_info_print_table_row(2, "jam extension", "enabled");
-	php_info_print_table_row(2, "jam version", PHP_AWARE_EXTVER);
+	php_info_print_table_row(2, "jam version", PHP_JAM_EXTVER);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES(); 
@@ -729,7 +729,7 @@ zend_module_entry jam_module_entry = {
 	PHP_RINIT(jam),
 	PHP_RSHUTDOWN(jam),
 	PHP_MINFO(jam),
-	PHP_AWARE_EXTVER,
+	PHP_JAM_EXTVER,
 	
 	PHP_MODULE_GLOBALS(jam),
 	PHP_GINIT(jam),
@@ -739,6 +739,6 @@ zend_module_entry jam_module_entry = {
 	STANDARD_MODULE_PROPERTIES_EX 
 };
 
-#ifdef COMPILE_DL_AWARE
+#ifdef COMPILE_DL_JAM
 ZEND_GET_MODULE(jam)
 #endif

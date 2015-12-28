@@ -103,20 +103,20 @@ CURLcode curl_fetch_url(CURL *ch, const char *url, struct curl_fetch_st *fetch) 
 ZEND_DECLARE_MODULE_GLOBALS(jam_elasticsearch)
 
 php_jam_storage_module php_jam_storage_module_elasticsearch = {
-	PHP_AWARE_STORAGE_MOD(elasticsearch)
+	PHP_JAM_STORAGE_MOD(elasticsearch)
 };
 
-PHP_AWARE_CONNECT_FUNC(elasticsearch)
+PHP_JAM_CONNECT_FUNC(elasticsearch)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_GET_FUNC(elasticsearch)
+PHP_JAM_GET_FUNC(elasticsearch)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_STORE_FUNC(elasticsearch)
+PHP_JAM_STORE_FUNC(elasticsearch)
 {
     /*const char *uuid; 
     zval *event; 
@@ -177,7 +177,7 @@ PHP_AWARE_STORE_FUNC(elasticsearch)
     curl_easy_setopt(ch, CURLOPT_POSTFIELDS, json_object_to_json_string(json));
 
     /* fetch page and capture return code */
-    rcode = curl_fetch_url(ch, AWARE_ELASTICSEARCH_G(host), cf);
+    rcode = curl_fetch_url(ch, JAM_ELASTICSEARCH_G(host), cf);
 
     /* cleanup curl handle */
     curl_easy_cleanup(ch);
@@ -192,7 +192,7 @@ PHP_AWARE_STORE_FUNC(elasticsearch)
     if (rcode != CURLE_OK || cf->size < 1) {
         /* log error */
         jam_printf("ERROR: Failed to fetch url (%s) - curl said: %s",
-            url, curl_easy_strerror(rcode));
+            JAM_ELASTICSEARCH_G(host), curl_easy_strerror(rcode));
         /* return error */
         return AwareOperationFailed;
     }
@@ -202,17 +202,17 @@ PHP_AWARE_STORE_FUNC(elasticsearch)
     return AwareOperationSuccess;
 }
 
-PHP_AWARE_GET_LIST_FUNC(elasticsearch)
+PHP_JAM_GET_LIST_FUNC(elasticsearch)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DELETE_FUNC(elasticsearch)
+PHP_JAM_DELETE_FUNC(elasticsearch)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DISCONNECT_FUNC(elasticsearch)
+PHP_JAM_DISCONNECT_FUNC(elasticsearch)
 {
 	return AwareOperationNotSupported;
 }
@@ -234,21 +234,21 @@ PHP_MINIT_FUNCTION(jam_elasticsearch)
 	ZEND_INIT_MODULE_GLOBALS(jam_elasticsearch, php_jam_elasticsearch_init_globals, NULL);
 	REGISTER_INI_ENTRIES();
 	
-	reg_status = PHP_AWARE_STORAGE_REGISTER(elasticsearch);
+	reg_status = PHP_JAM_STORAGE_REGISTER(elasticsearch);
 	
 	switch (reg_status) 
 	{
 		case AwareModuleRegistered:	
-			AWARE_ELASTICSEARCH_G(enabled) = 1;
+			JAM_ELASTICSEARCH_G(enabled) = 1;
 		break;
 		
 		case AwareModuleFailed:
-			AWARE_ELASTICSEARCH_G(enabled) = 0;
+			JAM_ELASTICSEARCH_G(enabled) = 0;
 			return FAILURE;
 		break;
 
 		case AwareModuleNotConfigured:
-			AWARE_ELASTICSEARCH_G(enabled) = 0;
+			JAM_ELASTICSEARCH_G(enabled) = 0;
 		break;	
 	}
 	return SUCCESS;
@@ -269,7 +269,7 @@ PHP_MINFO_FUNCTION(jam_elasticsearch)
 {	
 	php_info_print_table_start();
 	php_info_print_table_row(2, "jam_elasticsearch storage", "enabled");
-	php_info_print_table_row(2, "jam_elasticsearch version", PHP_AWARE_ELASTICSEARCH_EXTVER);
+	php_info_print_table_row(2, "jam_elasticsearch version", PHP_JAM_ELASTICSEARCH_EXTVER);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES(); 
@@ -288,10 +288,10 @@ zend_module_entry jam_elasticsearch_module_entry = {
         NULL,
         NULL,
         PHP_MINFO(jam_elasticsearch),
-    	PHP_AWARE_ELASTICSEARCH_EXTVER,
+    	PHP_JAM_ELASTICSEARCH_EXTVER,
         STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_AWARE_ELASTICSEARCH
+#ifdef COMPILE_DL_JAM_ELASTICSEARCH
 ZEND_GET_MODULE(jam_elasticsearch)
 #endif

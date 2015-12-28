@@ -16,8 +16,8 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef PHP_AWARE_TOKYO_CABINET_H
-# define PHP_AWARE_TOKYO_CABINET_H
+#ifndef PHP_JAM_TOKYO_CABINET_H
+# define PHP_JAM_TOKYO_CABINET_H
 
 #include <tcutil.h>
 #include <tctdb.h>

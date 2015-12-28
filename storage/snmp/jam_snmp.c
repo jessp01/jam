@@ -56,12 +56,12 @@ AwareOperationStatus php_jam_send_snmp_trap(netsnmp_session *sess, const char *u
 		return AwareOperationFailed;
 	}
 
-	if (snmp_add_var(pdu, objid_snmptrap, sizeof(objid_snmptrap) / sizeof(oid), 'o', AWARE_SNMP_G(error_msg_oid)) != 0) {
+	if (snmp_add_var(pdu, objid_snmptrap, sizeof(objid_snmptrap) / sizeof(oid), 'o', JAM_SNMP_G(error_msg_oid)) != 0) {
 		return AwareOperationFailed;
 	}
 	
 	/* First parameter is the uuid of the event */
-	if (!snmp_parse_oid(AWARE_SNMP_G(uuid_oid), objid_uuid, &oid_len)) {
+	if (!snmp_parse_oid(JAM_SNMP_G(uuid_oid), objid_uuid, &oid_len)) {
 		return AwareOperationFailed;
 	}
 	if (snmp_add_var(pdu, objid_uuid, oid_len, 's', uuid) != 0) {
@@ -69,7 +69,7 @@ AwareOperationStatus php_jam_send_snmp_trap(netsnmp_session *sess, const char *u
 	}
 
 	/* Next filename and line */
-	if (!snmp_parse_oid(AWARE_SNMP_G(name_oid), objid_php_name, &oid_len)) {
+	if (!snmp_parse_oid(JAM_SNMP_G(name_oid), objid_php_name, &oid_len)) {
 		return AwareOperationFailed;
 	}
 
@@ -83,7 +83,7 @@ AwareOperationStatus php_jam_send_snmp_trap(netsnmp_session *sess, const char *u
 	}
 
 	/* And error message last */
-	if (!snmp_parse_oid(AWARE_SNMP_G(error_msg_oid), objid_php_message, &oid_len)) {
+	if (!snmp_parse_oid(JAM_SNMP_G(error_msg_oid), objid_php_message, &oid_len)) {
 		return AwareOperationFailed;
 	}
 	if (snmp_add_var(pdu, objid_php_message, oid_len, 's', message) != 0) {
@@ -143,48 +143,48 @@ void php_jam_deinit_snmp_session(netsnmp_session *session)
 /* }}} */
 
 php_jam_storage_module php_jam_storage_module_snmp = {
-	PHP_AWARE_STORAGE_MOD(snmp)
+	PHP_JAM_STORAGE_MOD(snmp)
 };
 
-PHP_AWARE_CONNECT_FUNC(snmp)
+PHP_JAM_CONNECT_FUNC(snmp)
 {
 	/* First time connect */
-	if (!AWARE_SNMP_G(snmp_sess)) {
-		AWARE_SNMP_G(snmp_sess) = php_jam_snmp_init_snmp_session(AWARE_SNMP_G(trap_host), AWARE_SNMP_G(trap_community));
+	if (!JAM_SNMP_G(snmp_sess)) {
+		JAM_SNMP_G(snmp_sess) = php_jam_snmp_init_snmp_session(JAM_SNMP_G(trap_host), JAM_SNMP_G(trap_community));
 		
-		if (!AWARE_SNMP_G(snmp_sess)) {
+		if (!JAM_SNMP_G(snmp_sess)) {
 			return AwareOperationFailed;
 		}
 	}
 	return AwareOperationSuccess;
 }
 
-PHP_AWARE_GET_FUNC(snmp)
+PHP_JAM_GET_FUNC(snmp)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_STORE_FUNC(snmp)
+PHP_JAM_STORE_FUNC(snmp)
 {
 	zval **ppzval;
 	if (zend_hash_find(Z_ARRVAL_P(event), "error_message", sizeof("error_message"), (void **) &ppzval) == SUCCESS) {
-		return php_jam_send_snmp_trap(AWARE_SNMP_G(snmp_sess), uuid, Z_STRVAL_PP(ppzval), error_filename, error_lineno TSRMLS_CC);
+		return php_jam_send_snmp_trap(JAM_SNMP_G(snmp_sess), uuid, Z_STRVAL_PP(ppzval), error_filename, error_lineno TSRMLS_CC);
 	} else {
-		return php_jam_send_snmp_trap(AWARE_SNMP_G(snmp_sess), uuid, "No error message", error_filename, error_lineno TSRMLS_CC);
+		return php_jam_send_snmp_trap(JAM_SNMP_G(snmp_sess), uuid, "No error message", error_filename, error_lineno TSRMLS_CC);
 	}
 }
 
-PHP_AWARE_GET_LIST_FUNC(snmp)
+PHP_JAM_GET_LIST_FUNC(snmp)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DELETE_FUNC(snmp)
+PHP_JAM_DELETE_FUNC(snmp)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DISCONNECT_FUNC(snmp)
+PHP_JAM_DISCONNECT_FUNC(snmp)
 {
 	/* Disconnect happens on MSHUTDOWN */
 	return AwareOperationNotSupported;
@@ -217,32 +217,32 @@ static void php_jam_snmp_init_globals(zend_jam_snmp_globals *jam_snmp_globals)
 
 static zend_bool php_jam_snmp_check_config(TSRMLS_D)
 {
-	if (!AWARE_SNMP_G(trap_host)) {
+	if (!JAM_SNMP_G(trap_host)) {
 		php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_snmp, missing jam_snmp.trap_host");
 		return 0;
 	}
 
-	if (!AWARE_SNMP_G(trap_community)) {
+	if (!JAM_SNMP_G(trap_community)) {
 		php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_snmp, missing jam_snmp.trap_community");
 		return 0;
 	}
 
-	if (!AWARE_SNMP_G(name_oid)) {
+	if (!JAM_SNMP_G(name_oid)) {
 		php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_snmp, missing jam_snmp.name_oid");
 		return 0;
 	}
 
-	if (!AWARE_SNMP_G(error_msg_oid)) {
+	if (!JAM_SNMP_G(error_msg_oid)) {
 		php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_snmp, missing jam_snmp.error_msg_oid");
 		return 0;
 	}
 	
-	if (!AWARE_SNMP_G(uuid_oid)) {
+	if (!JAM_SNMP_G(uuid_oid)) {
 		php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_snmp, missing jam_snmp.uuid_oid");
 		return 0;
 	}
 
-	if (!AWARE_SNMP_G(trap_oid)) {
+	if (!JAM_SNMP_G(trap_oid)) {
 		php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_snmp, missing jam_snmp.trap_oid");
 		return 0;
 	}
@@ -257,25 +257,25 @@ PHP_MINIT_FUNCTION(jam_snmp)
 	ZEND_INIT_MODULE_GLOBALS(jam_snmp, php_jam_snmp_init_globals, NULL);
 	REGISTER_INI_ENTRIES();
 
-    reg_status = PHP_AWARE_STORAGE_REGISTER(snmp);
+    reg_status = PHP_JAM_STORAGE_REGISTER(snmp);
 	
 	switch (reg_status) 
 	{
 		case AwareModuleRegistered:
 			if (!php_jam_snmp_check_config(TSRMLS_C)) {
-				AWARE_SNMP_G(enabled) = 0;
+				JAM_SNMP_G(enabled) = 0;
 				return FAILURE;
 			}
-			AWARE_SNMP_G(enabled) = 1;
+			JAM_SNMP_G(enabled) = 1;
 		break;
 		
 		case AwareModuleFailed:
-			AWARE_SNMP_G(enabled) = 0;
+			JAM_SNMP_G(enabled) = 0;
 			return FAILURE;
 		break;
 
 		case AwareModuleNotConfigured:
-			AWARE_SNMP_G(enabled) = 0;
+			JAM_SNMP_G(enabled) = 0;
 		break;
 	}
 	return SUCCESS;
@@ -285,9 +285,9 @@ PHP_MINIT_FUNCTION(jam_snmp)
 /* {{{ PHP_MSHUTDOWN_FUNCTION(jam_snmp) */
 PHP_MSHUTDOWN_FUNCTION(jam_snmp)
 {
-	if (AWARE_SNMP_G(enabled)) {
-		if (AWARE_SNMP_G(snmp_sess)) {
-			php_jam_deinit_snmp_session(AWARE_SNMP_G(snmp_sess));
+	if (JAM_SNMP_G(enabled)) {
+		if (JAM_SNMP_G(snmp_sess)) {
+			php_jam_deinit_snmp_session(JAM_SNMP_G(snmp_sess));
 		}
 	}
 	UNREGISTER_INI_ENTRIES();
@@ -301,7 +301,7 @@ PHP_MINFO_FUNCTION(jam_snmp)
 {	
 	php_info_print_table_start();
 	php_info_print_table_row(2, "jam_snmp storage", "enabled");
-	php_info_print_table_row(2, "jam_snmp version", PHP_AWARE_SNMP_EXTVER);
+	php_info_print_table_row(2, "jam_snmp version", PHP_JAM_SNMP_EXTVER);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES(); 
@@ -320,10 +320,10 @@ zend_module_entry jam_snmp_module_entry = {
         NULL,
         NULL,
         PHP_MINFO(jam_snmp),
-    	PHP_AWARE_SNMP_EXTVER,
+    	PHP_JAM_SNMP_EXTVER,
         STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_AWARE_SNMP
+#ifdef COMPILE_DL_JAM_SNMP
 ZEND_GET_MODULE(jam_snmp)
 #endif

@@ -23,16 +23,16 @@
 ZEND_DECLARE_MODULE_GLOBALS(jam_stomp)
 
 php_jam_storage_module php_jam_storage_module_stomp = {
-	PHP_AWARE_STORAGE_MOD(stomp)
+	PHP_JAM_STORAGE_MOD(stomp)
 };
 
-PHP_AWARE_CONNECT_FUNC(stomp)
+PHP_JAM_CONNECT_FUNC(stomp)
 {
 	char *err_msg;
 	int err_code;
 
-	if (!php_jam_stomp_connect(AWARE_STOMP_G(handle), AWARE_STOMP_G(server_uri), 
-									AWARE_STOMP_G(username), AWARE_STOMP_G(password), &err_msg, &err_code TSRMLS_CC)) {
+	if (!php_jam_stomp_connect(JAM_STOMP_G(handle), JAM_STOMP_G(server_uri), 
+									JAM_STOMP_G(username), JAM_STOMP_G(password), &err_msg, &err_code TSRMLS_CC)) {
 		
 		if (err_msg) {
 			php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Unable to connect jam_stomp: %s", err_msg);
@@ -43,17 +43,17 @@ PHP_AWARE_CONNECT_FUNC(stomp)
 	return AwareOperationSuccess;
 }
 
-PHP_AWARE_GET_FUNC(stomp)
+PHP_JAM_GET_FUNC(stomp)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_STORE_FUNC(stomp)
+PHP_JAM_STORE_FUNC(stomp)
 {
 	smart_str string = {0};
 	php_jam_storage_serialize(uuid, event, &string TSRMLS_CC);
 	
-	if (!php_jam_stomp_send(AWARE_STOMP_G(handle), AWARE_STOMP_G(queue_name), string.c, string.len TSRMLS_CC)) {
+	if (!php_jam_stomp_send(JAM_STOMP_G(handle), JAM_STOMP_G(queue_name), string.c, string.len TSRMLS_CC)) {
 		smart_str_free(&string);
 		return AwareOperationFailed;
 	}
@@ -61,19 +61,19 @@ PHP_AWARE_STORE_FUNC(stomp)
 	return AwareOperationSuccess;
 }
 
-PHP_AWARE_GET_LIST_FUNC(stomp)
+PHP_JAM_GET_LIST_FUNC(stomp)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DELETE_FUNC(stomp)
+PHP_JAM_DELETE_FUNC(stomp)
 {
 	return AwareOperationNotSupported;
 }
 
-PHP_AWARE_DISCONNECT_FUNC(stomp)
+PHP_JAM_DISCONNECT_FUNC(stomp)
 {
-	(void) php_jam_stomp_disconnect(AWARE_STOMP_G(handle) TSRMLS_CC);
+	(void) php_jam_stomp_disconnect(JAM_STOMP_G(handle) TSRMLS_CC);
 	return AwareOperationSuccess;
 }
 
@@ -102,31 +102,31 @@ PHP_MINIT_FUNCTION(jam_stomp)
 	ZEND_INIT_MODULE_GLOBALS(jam_stomp, php_jam_stomp_init_globals, NULL);
 	REGISTER_INI_ENTRIES();
 	
-	reg_status = PHP_AWARE_STORAGE_REGISTER(stomp);
+	reg_status = PHP_JAM_STORAGE_REGISTER(stomp);
 	
 	switch (reg_status) 
 	{
 		case AwareModuleRegistered:
-			if (!AWARE_STOMP_G(server_uri)) {
-				AWARE_STOMP_G(enabled) = 0;
+			if (!JAM_STOMP_G(server_uri)) {
+				JAM_STOMP_G(enabled) = 0;
 				php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_stomp, missing jam_stomp.server_uri");
 				return FAILURE;
 			}
 
-			AWARE_STOMP_G(enabled) = 1;
-			AWARE_STOMP_G(handle)  = php_jam_stomp_init();
+			JAM_STOMP_G(enabled) = 1;
+			JAM_STOMP_G(handle)  = php_jam_stomp_init();
 			
-			if (!AWARE_STOMP_G(handle))
+			if (!JAM_STOMP_G(handle))
 				php_jam_original_error_cb(E_ERROR TSRMLS_CC, "Failed to allocate memory");
 		break;
 		
 		case AwareModuleFailed:
-			AWARE_STOMP_G(enabled) = 0;
+			JAM_STOMP_G(enabled) = 0;
 			return FAILURE;
 		break;
 
 		case AwareModuleNotConfigured:
-			AWARE_STOMP_G(enabled) = 0;
+			JAM_STOMP_G(enabled) = 0;
 		break;	
 	}
 	return SUCCESS;
@@ -138,8 +138,8 @@ PHP_MSHUTDOWN_FUNCTION(jam_stomp)
 {
 	UNREGISTER_INI_ENTRIES();
 	
-	if (AWARE_STOMP_G(enabled) && AWARE_STOMP_G(handle)) {
-		php_jam_stomp_deinit(AWARE_STOMP_G(handle) TSRMLS_CC);
+	if (JAM_STOMP_G(enabled) && JAM_STOMP_G(handle)) {
+		php_jam_stomp_deinit(JAM_STOMP_G(handle) TSRMLS_CC);
 	}
 	
 	return SUCCESS;
@@ -152,7 +152,7 @@ PHP_MINFO_FUNCTION(jam_stomp)
 {	
 	php_info_print_table_start();
 	php_info_print_table_row(2, "jam_stomp storage", "enabled");
-	php_info_print_table_row(2, "jam_stomp version", PHP_AWARE_STOMP_EXTVER);
+	php_info_print_table_row(2, "jam_stomp version", PHP_JAM_STOMP_EXTVER);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES(); 
@@ -171,10 +171,10 @@ zend_module_entry jam_stomp_module_entry = {
         NULL,
         NULL,
         PHP_MINFO(jam_stomp),
-    	PHP_AWARE_STOMP_EXTVER,
+    	PHP_JAM_STOMP_EXTVER,
         STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_AWARE_STOMP
+#ifdef COMPILE_DL_JAM_STOMP
 ZEND_GET_MODULE(jam_stomp)
 #endif

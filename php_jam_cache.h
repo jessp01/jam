@@ -16,8 +16,8 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef _PHP_AWARE_CACHE_H_
-# define _PHP_AWARE_CACHE_H_
+#ifndef _PHP_JAM_CACHE_H_
+# define _PHP_JAM_CACHE_H_
 
 #include "php_jam_private.h"
 

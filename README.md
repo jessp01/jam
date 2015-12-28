@@ -178,7 +178,7 @@ All available backends are under the storage dir, config and build instructions 
     </tr><tr>    
         <td> jam.storage_modules </td>
 		<td> string </td>
-		<td> List of storage backend modules to enabled (CSV)</td>
+		<td> Comma separated list of storage backend modules to enabled (i.e aware.storage_modules="elasticsearch,email")</td>
 	    <td>PHP_INI_PERDIR</td>
     </tr><tr>
         <td> jam.slow_request_threshold </td>

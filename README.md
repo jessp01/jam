@@ -16,7 +16,7 @@ php-aware was developed by Mikko Koppanen.
 
 # How does it work?
 
-The jam extension overrides Zend's Engine zend_error_cb(), set_error_handler() and restore_error_handler() with a custom function that takes a copy of the current context, sends the error to the backends set in the aware.storage_modules directive and then calls the original error handler(s).
+The jam extension overrides Zend's Engine zend_error_cb(), set_error_handler() and restore_error_handler() with a custom function that takes a copy of the current context, sends the error to the backends set in the jam.storage_modules directive and then calls the original error handler(s).
 
 Each backend storage is a separate PHP extension and additional backends can therefore easily be added, see the "Creating additional storage backends" section. 
 
@@ -46,6 +46,11 @@ const char *appname; // app identifier string, configured with the aware.appname
 
 # Basic setup    
 
+## Debian/Ubuntu and friends
+To build debs for your distribution, enter the debian dir under the root source dir and run:
+```
+$ dpkg-buildpackage -b -uc
+```
 
 ## RHEL/CentOS and friends
 The JaM extensions are available from Kaltura's CE repo.
@@ -83,7 +88,6 @@ If you use a different distro that supports RPM, you can build the packages from
 $ rpmbuild -bb --with email --with files --with snmp --with elasticsearch php-jam.spec
 ```
 
-## Debian/Ubuntu and friends
 
 ## Compiling from source
 

@@ -1,5 +1,5 @@
 # Available build options, you will need rpm-build >= 4.0.3 for this to work.
-# Example: rpmbuild -ba --with email jam.spec
+# Example: rpmbuild -ba --with email php-jam.spec
 #
 #  Storage Options
 #  ===============
@@ -10,35 +10,33 @@
 #  --with stomp
 #  --with tokyo
 #  --with zeromq2
+#  --with elasticsearch
 
 #
 # These setup the storage backends to off by default
 #
 %bcond_with email
-%bcond_with files
+%bcond_with elasticsearch
 %bcond_with snmp
+%bcond_with files
 %bcond_with spread
 %bcond_with stomp
 %bcond_with tokyo
 %bcond_with zeromq2
 
 
-# Define version and release number
-%define version @PACKAGE_VERSION@
-%define release 1
-
 Name:      php-jam
-Version:   %{version}
-Release:   %{release}%{?dist}
-Packager:  Mikko Koppanen <mkoppanen@php.net>
-Summary:   PHP jam extension
+Version:   1.0.0
+Release:   2
+Packager:  Jess Portnoy <jess.portnoy@kaltura.com>
+Summary:   PHP monitoring system that supports storing PHP errors (events) into different storage backends. 
 License:   PHP License
 Group:     Web/Applications
 URL:       http://github.com/mkoppanen/php-jam
 Source:    jam-%{version}.tgz
 Prefix:    %{_prefix}
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
-BuildRequires: php-devel, make, gcc, /usr/bin/phpize
+BuildRequires: php-devel, make, gcc, /usr/bin/phpize, libuuid-devel
 
 %description
 Monitoring extension for PHP
@@ -117,6 +115,17 @@ Requires: %{name} = %{version}-%{release}
 %{name} backend implementation which sends events via zeromq2.
 %endif
 
+### Conditional build for zeromq2
+%if %{with elasticsearch}
+%package elasticsearch
+Summary: Elasticsearch storage engine for %{name}
+Group:   Web/Applications
+Requires: %{name} = %{version}-%{release}
+BuildRequires: php-devel, make, gcc, /usr/bin/phpize, libcurl-devel, json-c-devel
+
+%description elasticsearch
+%{name} backend implementation which sends events to elasticsearch.
+%endif
 %prep
 %setup -q -n jam-%{version}
 
@@ -134,12 +143,18 @@ Requires: %{name} = %{version}-%{release}
 
 # Preliminary extension ini
 echo "extension=jam.so" > %{buildroot}/%{_sysconfdir}/php.d/jam.ini
+echo ';jam.storage_modules="elasticsearch,email"' >> %{buildroot}/%{_sysconfdir}/php.d/jam.ini
+echo ';jam.appname="JaM"' >> %{buildroot}/%{_sysconfdir}/php.d/jam.ini
+echo ';You can determine what errors each backend will store, if you uncomment this, only E_ERROR events will be emailed' >> %{buildroot}/%{_sysconfdir}/php.d/jam.ini
+echo ";jam.module_error_reporting='email=E_ERROR'" >> %{buildroot}/%{_sysconfdir}/php.d/jam.ini
 
 %if %{with email}
 	pushd storage/email
 	/usr/bin/phpize && cp ../../config.cache . && %configure -C && %{__make} %{?_smp_mflags}
 	%{__make} install INSTALL_ROOT=%{buildroot}
 	popd
+	echo "extension=jam_email.so" > %{buildroot}/%{_sysconfdir}/php.d/jam_email.ini
+	echo ';jam_email.to_address="you@exmaple.com"' >> %{buildroot}/%{_sysconfdir}/php.d/jam_email.ini
 %endif
 
 %if %{with files}
@@ -147,6 +162,8 @@ echo "extension=jam.so" > %{buildroot}/%{_sysconfdir}/php.d/jam.ini
 	/usr/bin/phpize && cp ../../config.cache . && %configure -C && %{__make} %{?_smp_mflags}
 	%{__make} install INSTALL_ROOT=%{buildroot}
 	popd
+	echo "extension=jam_files.so" > %{buildroot}/%{_sysconfdir}/php.d/jam_files.ini
+	echo ';jam_files.storage_path="/path/to/storage"' >> %{buildroot}/%{_sysconfdir}/php.d/jam_files.ini
 %endif
 
 %if %{with snmp}
@@ -168,6 +185,15 @@ echo "extension=jam.so" > %{buildroot}/%{_sysconfdir}/php.d/jam.ini
 	/usr/bin/phpize && cp ../../config.cache . && %configure -C && %{__make} %{?_smp_mflags}
 	%{__make} install INSTALL_ROOT=%{buildroot}
 	popd
+%endif
+
+%if %{with elasticsearch}
+	pushd storage/elasticsearch
+	/usr/bin/phpize && cp ../../config.cache . && %configure -C && %{__make} %{?_smp_mflags}
+	%{__make} install INSTALL_ROOT=%{buildroot}
+	popd
+	echo "extension=jam_elasticsearch.so" > %{buildroot}/%{_sysconfdir}/php.d/jam_elasticsearch.ini
+	echo ';jam_elasticsearch.host="http://localhost:9200/jam/log"' >> %{buildroot}/%{_sysconfdir}/php.d/jam_elasticsearch.ini
 %endif
 
 %if %{with zeromq2}
@@ -192,11 +218,13 @@ echo "extension=jam.so" > %{buildroot}/%{_sysconfdir}/php.d/jam.ini
 %if %{with email}
 %files email
 %{_libdir}/php/modules/jam_email.so
+%{_sysconfdir}/php.d/jam_email.ini
 %endif
 
 %if %{with files}
 %files files
 %{_libdir}/php/modules/jam_files.so
+%{_sysconfdir}/php.d/jam_files.ini
 %endif
 
 %if %{with snmp}
@@ -214,6 +242,12 @@ echo "extension=jam.so" > %{buildroot}/%{_sysconfdir}/php.d/jam.ini
 %{_libdir}/php/modules/jam_stomp.so
 %endif
 
+%if %{with elasticsearch}
+%files elasticsearch
+%{_libdir}/php/modules/jam_elasticsearch.so
+%{_sysconfdir}/php.d/jam_elasticsearch.ini
+%endif
+
 %if %{with zeromq2}
 %files zeromq2
 %{_libdir}/php/modules/jam_zeromq2.so
@@ -222,5 +256,5 @@ echo "extension=jam.so" > %{buildroot}/%{_sysconfdir}/php.d/jam.ini
 
 
 %changelog
-* Sat Dec 12 2009 Mikko Koppanen <mkoppanen@php.net>
- - Initial spec file
+* Tue Dec 29 2015 Jess Portnoy <jess.portnoy@kaltura.com>
+ - First JaM build.

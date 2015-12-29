@@ -46,14 +46,26 @@ const char *appname; // app identifier string, configured with the aware.appname
 
 # Basic setup    
 
-## Debian/Ubuntu and friends
-
 
 ## RHEL/CentOS and friends
 The JaM extensions are available from Kaltura's CE repo.
-To add the repo, run:
+To add the RHEL/CentOS 6 repo, add this to /etc/yum.repos.d/jam.list:
 ```
-# rpm -ihv http://installrepo.kaltura.org/releases/kaltura-release.noarch.rpm
+[Kaltura]
+name = Kaltura Server
+baseurl = http://installrepo.origin.kaltura.org/releases/latest/RPMS/$basearch/
+gpgkey = http://installrepo.origin.kaltura.org/releases/RPM-GPG-KEY-kaltura
+gpgcheck = 1
+enabled = 1
+```
+To add the RHEL/CentOS 7 repo, add this to /etc/yum.repos.d/jam.list:
+```
+[Kaltura]
+name = Kaltura Server
+baseurl = http://installrepo.origin.kaltura.org/rhel7/latest/RPMS/$basearch/
+gpgkey = http://installrepo.origin.kaltura.org/releases/RPM-GPG-KEY-kaltura
+gpgcheck = 1
+enabled = 1
 ```
 To install the main JaM ext:
 ```
@@ -62,9 +74,16 @@ To install the main JaM ext:
 
 To install the backends:
 ```
-# yum install php-jam-email php-jam-elasticsearch
+# yum install php-jam-email php-jam-elasticsearchi php-jam-snmp php-jam-files
 ```
 Then set proper values in /etc/php.d/jam\*.ini and reload Apache if needed.
+
+If you use a different distro that supports RPM, you can build the packages from php-jam.spec:
+```
+$ rpmbuild -bb --with email --with files --with snmp --with elasticsearch php-jam.spec
+```
+
+## Debian/Ubuntu and friends
 
 ## Compiling from source
 

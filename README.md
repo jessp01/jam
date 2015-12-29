@@ -50,7 +50,21 @@ const char *appname; // app identifier string, configured with the aware.appname
 
 
 ## RHEL/CentOS and friends
+The JaM extensions are available from Kaltura's CE repo.
+To add the repo, run:
+```
+# rpm -ihv http://installrepo.kaltura.org/releases/kaltura-release.noarch.rpm
+```
+To install the main JaM ext:
+```
+# yum install php-jam
+```
 
+To install the backends:
+```
+# yum install php-jam-email php-jam-elasticsearch
+```
+Then set proper values in /etc/php.d/jam\*.ini and reload Apache if needed.
 
 ## Compiling from source
 

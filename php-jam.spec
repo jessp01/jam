@@ -1,5 +1,5 @@
 # Available build options, you will need rpm-build >= 4.0.3 for this to work.
-# Example: rpmbuild -ba --with email php-jam.spec
+# Example: rpmbuild -ba --with email jam.spec
 #
 #  Storage Options
 #  ===============
@@ -16,13 +16,13 @@
 # These setup the storage backends to off by default
 #
 %bcond_with email
-%bcond_with elasticsearch
-%bcond_with snmp
 %bcond_with files
+%bcond_with snmp
 %bcond_with spread
 %bcond_with stomp
 %bcond_with tokyo
 %bcond_with zeromq2
+%bcond_with elasticsearch
 
 
 Name:      php-jam
@@ -77,6 +77,7 @@ Requires: %{name} = %{version}-%{release}
 Summary: SNMP storage engine for %{name}
 Group:   Web/Applications
 Requires: %{name} = %{version}-%{release}
+BuildRequires: net-snmp-devel
 
 %description snmp
 %{name} backend implementation which sends events as SNMP traps.

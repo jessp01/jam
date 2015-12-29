@@ -1,5 +1,5 @@
-php5-jam_1.0.0-1_amd64.deb php optional
-php5-jam-elasticsearch_1.0.0-1_amd64.deb php optional
-php5-jam-email_1.0.0-1_amd64.deb php optional
-php5-jam-snmp_1.0.0-1_amd64.deb php optional
-php5-jam-files_1.0.0-1_amd64.deb php optional
+php5-jam_1.0.0-6_amd64.deb php optional
+php5-jam-elasticsearch_1.0.0-6_amd64.deb php optional
+php5-jam-email_1.0.0-6_amd64.deb php optional
+php5-jam-snmp_1.0.0-6_amd64.deb php optional
+php5-jam-files_1.0.0-6_amd64.deb php optional

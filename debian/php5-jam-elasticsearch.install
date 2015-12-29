@@ -1,2 +1,3 @@
 debian/tmp/usr/lib/php5/20121212/jam_elasticsearch.so /usr/lib/php5/20121212/
-debian/jam_elasticsearch.ini /etc/php5/mods-available/
+debian/jam-elasticsearch.ini /etc/php5/mods-available/
+debian/jam-elasticsearch.ini /usr/share/php5/jam-elasticsearch/

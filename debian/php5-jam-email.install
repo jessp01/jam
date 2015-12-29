@@ -1,2 +1,3 @@
 debian/tmp/usr/lib/php5/20121212/jam_email.so /usr/lib/php5/20121212/
-debian/jam_email.ini /etc/php5/mods-available/
+debian/jam-email.ini /etc/php5/mods-available/
+debian/jam-email.ini /usr/share/php5/jam-email/

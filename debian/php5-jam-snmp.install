@@ -1,2 +1,3 @@
 debian/tmp/usr/lib/php5/20121212/jam_snmp.so /usr/lib/php5/20121212/
-debian/jam_snmp.ini /etc/php5/mods-available/
+debian/jam-snmp.ini /etc/php5/mods-available/
+debian/jam-snmp.ini /usr/share/php5/jam-snmp/

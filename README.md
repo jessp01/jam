@@ -47,7 +47,15 @@ const char *appname; // app identifier string, configured with the aware.appname
 # Basic setup    
 
 ## Debian/Ubuntu and friends
-To build debs for your distribution, enter the debian dir under the root source dir and run:
+For Ubuntu 14.04 and any other deb based distro that uses php5 = 5.5.n, binary packages are available from Kaltura's CE repo:
+```
+# wget -O - http://installrepo.kaltura.org/repo/apt/debian/kaltura-deb.gpg.key|apt-key add -
+# echo "deb [arch=amd64] http://installrepo.kaltura.org/repo/apt/debian kajam main" > /etc/apt/sources.list.d/kaltura.list
+# aptitude install php5-jam php5-jam-elasticsearch php5-jam-email php5-files
+```
+Then edit /etc/php5/mod-enabled/jam\*ini and set directives per your configuration.
+
+To build debs for your deb based distribution, enter the debian dir under the root source dir and run:
 ```
 $ dpkg-buildpackage -b -uc
 ```

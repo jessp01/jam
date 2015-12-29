@@ -1,0 +1,42 @@
+Source: php5-jam-extensions
+Section: php
+Priority: optional
+Maintainer: Jess Portnoy <jess.portnoy@kaltura.com>
+Build-Depends: debhelper (>= 9), php5-dev (>= 5.3.0), pkg-php-tools (>= 1.6)
+Standards-Version: 3.9.5
+Homepage: https://github.com/jessp01/jam
+
+Package: php5-jam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, php5, libuuid  
+Build-Depends: debhelper (>= 9), php5-dev (>= 5.3.0), pkg-php-tools (>= 1.6), libjson-c-dev, libcurl-dev, uuid-dev
+Provides: php5-jam
+Description: PHP JaM backend implementation which sends PHP events to an ElasticSearch server.
+
+Package: php5-jam-elasticsearch
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, php5-jam, libjson-c, libcurl4
+Build-Depends: debhelper (>= 9), php5-dev (>= 5.3.0), pkg-php-tools (>= 1.6), libjson-c-dev, libcurl-dev
+Provides: php5-jam-elasticsearch
+Description: PHP JaM backend implementation which sends PHP events to an ElasticSearch server.
+
+Package: php5-jam-email
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, php5-jam 
+Build-Depends: debhelper (>= 9), php5-dev (>= 5.3.0), pkg-php-tools (>= 1.6), libjson-c-dev, libcurl-dev
+Provides: php5-jam-email
+Description: PHP JaM backend implementation which sends PHP events by mail.
+
+Package: php5-jam-snmp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, php5-jam, libsnmp
+Build-Depends: debhelper (>= 9), php5-dev (>= 5.3.0), pkg-php-tools (>= 1.6), libsnmp-dev
+Provides: php5-jam-snmp
+Description: PHP JaM backend implementation which sends PHP events over SNMP.
+
+Package: php5-jam-files
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, php5-jam
+Build-Depends: debhelper (>= 9), php5-dev (>= 5.3.0), pkg-php-tools (>= 1.6)
+Provides: php5-jam-files
+Description: PHP JaM backend implementation which serializes PHP events into the FS.

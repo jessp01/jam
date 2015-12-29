@@ -1,0 +1,86 @@
+#!/usr/bin/make -f
+
+JAM_VERSION := 1.0.0
+archive := php5-jam-$(JAM_VERSION).tar.gz 
+tree := `pwd`/jam-$(JAM_VERSION)
+BASE_PREFIX = `/usr/bin/php-config5 --extension-dir` 
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+CFLAGS = `dpkg-buildflags --get CFLAGS`
+CFLAGS += -Wall
+LDFLAGS = `dpkg-buildflags --get LDFLAGS`
+CPPFLAGS = `dpkg-buildflags --get CPPFLAGS`
+
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+	INSTALL_PROGRAM += -s
+endif
+$(archive):
+	wget https://github.com/jessp01/jam/archive/$(JAM_VERSION).tar.gz -O $(archive)
+
+$(tree): $(archive)
+	tar zxf $(archive) 
+
+config.status: $(tree) 
+	dh_testdir
+	CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" cd $(tree) && phpize && ./configure --with-php-config=/usr/bin/php-config5
+	for MOD in files snmp elasticsearch email; do \
+		CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" cd  jam-$(JAM_VERSION)/storage/$$MOD && phpize && ./configure --with-php-config=/usr/bin/php-config5; \
+		cd ../../../; \
+	done;
+
+build: build-stamp
+
+build-stamp:  config.status
+	#dh_quilt_patch
+	dh_testdir
+	cd $(tree) && $(MAKE)
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp config.log
+	rm -rf $(tree)
+	dh_quilt_unpatch
+	dh_clean 
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k 
+	dh_installdirs
+	mkdir -p $(CURDIR)/debian/tmp/$(BASE_PREFIX)
+	cd $(tree) && $(MAKE) && install -m 644 -o root -g root $(CURDIR)/jam-$(JAM_VERSION)/modules/jam.so $(CURDIR)/debian/tmp/usr/lib/php5/20121212/jam.so 
+	for MOD in files snmp elasticsearch email; do \
+		ext=`/usr/bin/php-config5 --extension-dir`; \
+		CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"  cd  jam-$(JAM_VERSION)/storage/$$MOD && $(MAKE); \
+		install -m 644 -o root -g root modules/jam_$$MOD.so ../../../debian/tmp$$ext/jam_$$MOD.so; \
+		cd ../../../; \
+	done;
+
+
+# Build architecture-independent files here.
+binary-indep:;
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_gencontrol
+	dh_installdebconf	
+	dh_installinit
+	dh_installman
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_install
+	dh_installdeb
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install 

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+    inifile=jam.ini
+    dpkg-maintscript-helper mv_conffile /etc/php5/conf.d/${inifile} /etc/php5/mods-available/${inifile}  -- "$@";
+
+exit 0

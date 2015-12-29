@@ -1,0 +1,2 @@
+debian/tmp/usr/lib/php5/20121212/jam_files.so /usr/lib/php5/20121212/
+debian/jam_files.ini /etc/php5/mods-available/

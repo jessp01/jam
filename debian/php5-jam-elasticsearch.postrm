@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -e
+
+EXT_NAME=jam-elasticsearch
+inidir=/etc/php5/mods-available
+    inifile=${EXT_NAME}.ini
+
+    dpkg-maintscript-helper mv_conffile /etc/php5/conf.d/${inifile} ${inidir}/${inifile}  -- "$@";
+
+    if [ "$1" = "purge" ]; then
+        # Query which package has this conffile registered
+	if which ucfq >/dev/null; then
+	    ucfp=$(ucfq -w ${inidir}/${inifile} | cut -f 2 -d:)
+	fi
+
+        # Only work with the config file if it still belongs to us
+	if test "$ucfp" = php5-$EXT_NAME; then
+	    for ext in '~' '%' .bak .ucf-new .ucf-old .ucf-dist;  do
+		rm -f ${inidir}/${inifile}${ext}
+	    done
+	    rm -f ${inidir}/${inifile}
+	    if which ucf >/dev/null; then
+		ucf --purge ${inidir}/${inifile}
+	    fi
+	    if which ucfr >/dev/null; then
+		ucfr --purge php5-$EXT_NAME ${inidir}/${inifile}
+	    fi
+	fi
+	
+	if [ -e /usr/share/php5/php5-maintscript-helper ] ; then
+	    . /usr/share/php5/php5-maintscript-helper
+
+		php5_invoke dismod ALL ${EXT_NAME}
+	fi
+    fi
+
+
+
+exit 0

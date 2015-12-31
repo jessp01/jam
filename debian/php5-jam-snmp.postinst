@@ -26,7 +26,7 @@ if [ "$1" = "configure" ]; then
 		fi
 	    fi
 	
-	    php5_invoke enmod ALL ${EXT_NAME}
+	    php5enmod ${EXT_NAME}
     fi
 fi
 

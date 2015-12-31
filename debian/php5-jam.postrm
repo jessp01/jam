@@ -31,7 +31,7 @@ inidir=/etc/php5/mods-available
 	if [ -e /usr/share/php5/php5-maintscript-helper ] ; then
 	    . /usr/share/php5/php5-maintscript-helper
 
-		php5_invoke dismod ALL ${EXT_NAME}
+	    	php5dismod ${EXT_NAME}
 	fi
     fi
 

@@ -8,7 +8,7 @@ if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
     if [ -e /usr/share/php5/php5-maintscript-helper ] ; then
 	. /usr/share/php5/php5-maintscript-helper
 
-	    php5_invoke dismod ALL ${EXT_NAME}
+	    php5dismod ${EXT_NAME}
     fi
 fi
 

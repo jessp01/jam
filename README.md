@@ -292,6 +292,12 @@ All available backends are under the storage dir, config and build instructions 
 		<td> The ElasticSearch URL to send the event to</td>
 		<td>PHP_INI_SYSTEM</td>
 	</tr>
+	<tr>
+		<td> jam_elasticsearch.timeout </td>
+		<td> Int </td>
+		<td> The maximum number of seconds to allow cURL functions to execute.</td>
+		<td>PHP_INI_SYSTEM</td>
+	</tr>
 </table>
 
 ## email

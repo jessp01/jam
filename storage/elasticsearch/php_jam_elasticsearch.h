@@ -43,6 +43,7 @@
 
 ZEND_BEGIN_MODULE_GLOBALS(jam_elasticsearch)
 	char *host;
+	int timeout;
 	zend_bool enabled;
 ZEND_END_MODULE_GLOBALS(jam_elasticsearch)
 

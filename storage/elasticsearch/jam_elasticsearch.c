@@ -56,7 +56,7 @@ size_t curl_callback (void *contents, size_t size, size_t nmemb, void *userp) {
     return realsize;
 }
 /* fetch and return url body via curl */
-CURLcode curl_fetch_url(CURL *ch, const char *url, struct curl_fetch_st *fetch) {
+CURLcode curl_fetch_url(CURL *ch, const char *url, struct curl_fetch_st *fetch, int timeout) {
     CURLcode rcode;                   /* curl result code */
 
     /* init payload */
@@ -86,7 +86,7 @@ CURLcode curl_fetch_url(CURL *ch, const char *url, struct curl_fetch_st *fetch) 
     curl_easy_setopt(ch, CURLOPT_USERAGENT, "php-jam-elasticsearch/1.0");
 
     /* set timeout */
-    curl_easy_setopt(ch, CURLOPT_TIMEOUT, 5);
+    curl_easy_setopt(ch, CURLOPT_TIMEOUT, timeout);
 
     /* enable location redirects */
     curl_easy_setopt(ch, CURLOPT_FOLLOWLOCATION, 1);
@@ -171,7 +171,7 @@ PHP_JAM_STORE_FUNC(elasticsearch)
     curl_easy_setopt(ch, CURLOPT_POSTFIELDS, json_object_to_json_string(json));
 
     /* fetch page and capture return code */
-    rcode = curl_fetch_url(ch, JAM_ELASTICSEARCH_G(host), cf);
+    rcode = curl_fetch_url(ch, JAM_ELASTICSEARCH_G(host), cf,JAM_ELASTICSEARCH_G(timeout));
 
     /* cleanup curl handle */
     curl_easy_cleanup(ch);
@@ -213,11 +213,13 @@ PHP_JAM_DISCONNECT_FUNC(elasticsearch)
 
 PHP_INI_BEGIN()
 	STD_PHP_INI_ENTRY("jam_elasticsearch.host", "http://localhost:9200/php-jam/events", PHP_INI_SYSTEM, OnUpdateString, host, zend_jam_elasticsearch_globals, jam_elasticsearch_globals)
+	STD_PHP_INI_ENTRY("jam_elasticsearch.timeout", "2", PHP_INI_SYSTEM, OnUpdateLong, timeout, zend_jam_elasticsearch_globals, jam_elasticsearch_globals)
 PHP_INI_END()
 
 static void php_jam_elasticsearch_init_globals(zend_jam_elasticsearch_globals *jam_elasticsearch_globals)
 {
-	jam_elasticsearch_globals->host = "http://localhost:9200/php-jam/events";	
+	jam_elasticsearch_globals->host = "http://localhost:9200/php-jam/events";
+	jam_elasticsearch_globals->timeout = 2;	
 }
 
 /* {{{ PHP_MINIT_FUNCTION(jam_elasticsearch) */

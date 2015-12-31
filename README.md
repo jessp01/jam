@@ -10,7 +10,7 @@ php-aware was developed by Mikko Koppanen.
 
 # What does JaM monitor?
 
-    - PHP errors of all levels [see http://php.net/manual/en/errorfunc.constants.php] 
+    - PHP errors of all levels see [Predefined contants] (http://php.net/manual/en/errorfunc.constants.php) 
     - Slow requests
     - Peak memory usage during request
 
@@ -23,7 +23,7 @@ php-aware was developed by Mikko Koppanen.
 
 The jam extension overrides Zend's Engine zend_error_cb(), set_error_handler() and restore_error_handler() with a custom function that takes a copy of the current context, sends the error to the backends set in the jam.storage_modules directive and then calls the original error handler(s).
 
-Each backend storage is a separate PHP extension and additional backends can therefore easily be added, see the "Creating additional storage backends" section. 
+Each backend storage is a separate PHP extension and additional backends can therefore easily be added, see [Creating additional storage backends] (https://github.com/jessp01/jam#creating-additional-storage-backends). 
 
 The backend will receive a zval * containing information about the current error which it then stores based on it's own configuration. 
 
@@ -42,7 +42,7 @@ const char *uuid; // uniq ID
 zval *event; // struct containing info about the event 
 const char *error_filename; // filename in which the error occured 
 long error_lineno; // line in which the error occured 
-long type; // error type, see http://php.net/manual/en/errorfunc.constants.php 
+long type; // error type, see [Predefined Constants] (http://php.net/manual/en/errorfunc.constants.php)
 const char *appname; // app identifier string, configured with the aware.appname directive but can be overridden from PHP code
 ```
 
@@ -126,7 +126,7 @@ $ make
 # make install
 ```
 
-See "Core INI settings" for the available directives.
+See [Core INI settings] (https://github.com/jessp01/jam#core-ini-settings) for the available directives.
 
 ### Compiling backend extensions
 By itself JaM will do pretty much nothing for you, next, select the backends you are interested in and cd into their dir under storage, for instance, if you are interested in the elasticsearch backend:
@@ -138,7 +138,7 @@ $ make
 # make install
 ```
 
-See "elasticsearch->INI settings" for the relevant directives.
+See [elasticsearch->INI settings] (https://github.com/jessp01/jam#ini-settings) for the relevant directives.
 
 All available backends are under the storage dir, config and build instructions are the same for all.
 

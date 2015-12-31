@@ -18,7 +18,7 @@
 
 #include "php_jam_stomp.h"
 
-#include "ext/standard/php_smart_str.h"
+#include "ext/standard/php_smart_string.h"
 #include "ext/standard/php_string.h"
 #include "ext/standard/php_var.h"
 
@@ -37,11 +37,11 @@ php_jam_stomp_handle *php_jam_stomp_init() {
 }
 
 zend_bool php_jam_stomp_send_frame(php_jam_stomp_handle *handle, 
-	const char *command, smart_str *headers, smart_str *body, zend_bool expect_response, smart_str *response TSRMLS_DC) 
+	const char *command, smart_string *headers, smart_string *body, zend_bool expect_response, smart_string *response TSRMLS_DC) 
 {
 	zend_bool done = 0;
 	zend_bool status;
-	smart_str sendbuf = {0};
+	smart_string sendbuf = {0};
 	char *buf, *line;
 	size_t read_len;
 
@@ -90,8 +90,8 @@ zend_bool php_jam_stomp_connect(php_jam_stomp_handle *handle,
 	const char *server_uri, const char *username, const char *password, char **err_msg, int *err_code TSRMLS_DC) 
 {
 	struct timeval tv;
-	smart_str headers  = {0};
-	smart_str response = {0};
+	smart_string headers  = {0};
+	smart_string response = {0};
 	zend_bool retval   = 0;
 
 	handle->stream = php_stream_xport_create(server_uri, strlen(server_uri),
@@ -141,8 +141,8 @@ zend_bool php_jam_stomp_connect(php_jam_stomp_handle *handle,
 zend_bool php_jam_stomp_send(php_jam_stomp_handle *handle, const char *queue_name, const char *message, long message_len TSRMLS_DC) 
 {
 	zend_bool retval;
-	smart_str headers = {0};
-	smart_str body    = {0};
+	smart_string headers = {0};
+	smart_string body    = {0};
 	
 	if (!handle->connected) {
 		return 0;

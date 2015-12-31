@@ -49,7 +49,7 @@ PHP_JAM_GET_FUNC(spread)
 PHP_JAM_STORE_FUNC(spread)
 {
 	int retval;
-	smart_str string = {0};
+	smart_string string = {0};
 	
 	php_jam_storage_serialize(uuid, event, &string TSRMLS_CC);
 	

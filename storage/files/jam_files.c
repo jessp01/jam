@@ -69,7 +69,7 @@ PHP_JAM_STORE_FUNC(files)
 {
 	char filename[MAXPATHLEN];
 	php_stream *stream;
-	smart_str string = {0};
+	smart_string string = {0};
 
 	if (snprintf(filename, MAXPATHLEN, "%s/%s.jam", JAM_FILES_G(storage_path), uuid) <= 0) {
 		return AwareOperationFailed;

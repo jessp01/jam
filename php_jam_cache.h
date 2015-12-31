@@ -20,6 +20,7 @@
 # define _PHP_JAM_CACHE_H_
 
 #include "php_jam_private.h"
+#include "zend_smart_str.h"
 
 /* {{{ void php_jam_cache_init(php_jam_serialize_cache *cache)
 */
@@ -31,14 +32,14 @@ void php_jam_cache_init(php_jam_serialize_cache *cache);
 void php_jam_cache_clean(php_jam_serialize_cache *cache);
 /* }}} */
 
-/* {{{ zend_bool php_jam_cache_get(php_jam_serialize_cache *cache, const char *uuid, smart_str *retval)
+/* {{{ zend_bool php_jam_cache_get(php_jam_serialize_cache *cache, const char *uuid, smart_string *retval)
 */
-zend_bool php_jam_cache_get(php_jam_serialize_cache *cache, const char *uuid, smart_str *retval);
+zend_bool php_jam_cache_get(php_jam_serialize_cache *cache, const char *uuid, smart_string *retval);
 /* }}} */
 
-/* {{{ void php_jam_cache_store(php_jam_serialize_cache *cache, const char *uuid, smart_str *data)
+/* {{{ void php_jam_cache_store(php_jam_serialize_cache *cache, const char *uuid, smart_string *data)
 */
-void php_jam_cache_store(php_jam_serialize_cache *cache, const char *uuid, smart_str *data);
+void php_jam_cache_store(php_jam_serialize_cache *cache, const char *uuid, smart_string *data);
 /* }}} */
 
 /* {{{ void php_jam_cache_deinit(php_jam_serialize_cache *cache)

@@ -50,7 +50,7 @@ PHP_JAM_GET_FUNC(stomp)
 
 PHP_JAM_STORE_FUNC(stomp)
 {
-	smart_str string = {0};
+	smart_string string = {0};
 	php_jam_storage_serialize(uuid, event, &string TSRMLS_CC);
 	
 	if (!php_jam_stomp_send(JAM_STOMP_G(handle), JAM_STOMP_G(queue_name), string.c, string.len TSRMLS_CC)) {

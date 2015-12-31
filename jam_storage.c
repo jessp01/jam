@@ -20,7 +20,7 @@
 #include "php_jam_storage.h"
 
 #include "ext/standard/php_var.h"
-#include "ext/standard/php_smart_str.h"
+#include "ext/standard/php_smart_string.h"
 #include "ext/standard/php_string.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(jam)
@@ -52,13 +52,15 @@ static zend_bool php_jam_storage_module_is_configured(const char *mod_name TSRML
 	pch = php_strtok_r(ptr, ",", &last);
 
 	while (pch != NULL) {
-		char *mod = php_trim(pch, strlen(pch), NULL, 0, NULL, 3 TSRMLS_CC);
+		zend_string *z_pch = zend_string_init(pch, sizeof(pch) - 1, 0);
+		zend_string *mod = php_trim(z_pch, NULL,0, 3);
 		
-		if (mod) {
-			if (!strcmp(mod, mod_name)) {
+		
+		if (mod->val) {
+			if (!strcmp(mod->val, mod_name)) {
 				retval = 1;
 			}
-			efree(mod);
+			zend_string_release(mod);
 		}
 		
 		/* all done ? */
@@ -126,15 +128,15 @@ void php_jam_storage_module_list(zval *return_value)
 
 	for (i = 0; i < MAX_MODULES; i++) {
 		if (php_jam_storage_modules[i]) {
-			add_next_index_string(return_value, php_jam_storage_modules[i]->name, 1);
+			add_next_index_string(return_value, php_jam_storage_modules[i]->name);
 		}
 	}
 }
 /* }}} */
 
-/* {{{ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var TSRMLS_DC)
+/* {{{ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_string *data_var)
 */
-MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var TSRMLS_DC)
+MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_string *data_var)
 {
 	php_serialize_data_t var_hash;
 	
@@ -184,7 +186,8 @@ void php_jam_storage_store(php_jam_storage_module *mod, const char *uuid, zval *
 	if (zend_hash_num_elements(&JAM_G(module_error_reporting)) > 0) {
 		long **level;
 		/* This means that we might have overriden error reporting level */
-		if (zend_hash_find(&JAM_G(module_error_reporting), mod->name, strlen(mod->name) + 1, (void **)&level) == SUCCESS) {
+		//if (zend_hash_find(&JAM_G(module_error_reporting), mod->name, strlen(mod->name) + 1, (void **)&level) == SUCCESS) {
+		if ((level = zend_hash_str_find(&JAM_G(module_error_reporting), mod->name, sizeof(mod->name)-1)) != NULL) {
 			/* Check if module is configured for this sort of errors */
 			if (!(**level & type)) {
 				return;

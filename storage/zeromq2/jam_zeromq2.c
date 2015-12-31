@@ -72,7 +72,7 @@ PHP_JAM_STORE_FUNC(zeromq2)
 	int rc;
 	zmq_msg_t msg;
 	
-	smart_str string = {0};
+	smart_string string = {0};
 	
 	php_jam_storage_serialize(uuid, event, &string TSRMLS_CC);
 	

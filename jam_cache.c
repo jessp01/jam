@@ -44,9 +44,9 @@ void php_jam_cache_clean(php_jam_serialize_cache *cache)
 }
 /* }}} */
 
-/* {{{ zend_bool php_jam_cache_get(php_jam_serialize_cache *cache, const char *uuid, smart_str *retval)
+/* {{{ zend_bool php_jam_cache_get(php_jam_serialize_cache *cache, const char *uuid, smart_string *retval)
 */
-zend_bool php_jam_cache_get(php_jam_serialize_cache *cache, const char *uuid, smart_str *retval)
+zend_bool php_jam_cache_get(php_jam_serialize_cache *cache, const char *uuid, smart_string *retval)
 {
 	if (cache->has_item && !strcmp(cache->uuid, uuid)) {
 		smart_str_appendl(retval, cache->data, cache->data_len);
@@ -57,9 +57,9 @@ zend_bool php_jam_cache_get(php_jam_serialize_cache *cache, const char *uuid, sm
 }
 /* }}} */
 
-/* {{{ void php_jam_cache_store(php_jam_serialize_cache *cache, const char *uuid, smart_str *data)
+/* {{{ void php_jam_cache_store(php_jam_serialize_cache *cache, const char *uuid, smart_string *data)
 */
-void php_jam_cache_store(php_jam_serialize_cache *cache, const char *uuid, smart_str *data)
+void php_jam_cache_store(php_jam_serialize_cache *cache, const char *uuid, smart_string *data)
 {
 	if (cache->has_item)
 		php_jam_cache_clean(cache);

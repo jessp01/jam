@@ -29,7 +29,7 @@ typedef struct _php_jam_stomp_handle {
 php_jam_stomp_handle *php_jam_stomp_init();
 
 zend_bool php_jam_stomp_send_frame(php_jam_stomp_handle *handle, 
-	const char *command, smart_str *headers, smart_str *body, zend_bool expect_response, smart_str *response TSRMLS_DC);
+	const char *command, smart_string *headers, smart_string *body, zend_bool expect_response, smart_string *response TSRMLS_DC);
 
 zend_bool php_jam_stomp_connect(php_jam_stomp_handle *handle, 
 	const char *server_uri, const char *username, const char *password, char **err_msg, int *err_code TSRMLS_DC);

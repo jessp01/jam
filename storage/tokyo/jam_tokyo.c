@@ -56,7 +56,7 @@ PHP_JAM_GET_FUNC(tokyo)
 PHP_JAM_STORE_FUNC(tokyo)
 {
 	zend_bool status = 0;
-	smart_str string = {0};
+	smart_string string = {0};
 	
 	php_jam_storage_serialize(uuid, event, &string TSRMLS_CC);
 	

@@ -14,6 +14,11 @@ php-aware was developed by Mikko Koppanen.
     - Slow requests
     - Peak memory usage during request
 
+# How is it better than just using set_error_handler() from my PHP code?
+
+* [set_error_handler()](http://php.net/manual/en/function.set-error-handler.php) will not capture FATAL errors
+* With set_error_handler(), one needs to change each app so that it calls this method, JaM, since it is a PHP extension, will globablly catch all PHP errors at the Zend Engine level, no matter what app code generated them and no matter which SAPI the code was called from [Apache, CLI, FCGI, etc]
+
 # How does it work?
 
 The jam extension overrides Zend's Engine zend_error_cb(), set_error_handler() and restore_error_handler() with a custom function that takes a copy of the current context, sends the error to the backends set in the jam.storage_modules directive and then calls the original error handler(s).
@@ -276,7 +281,10 @@ All available backends are under the storage dir, config and build instructions 
 # Storage backends 
 
 ## elasticsearch
-    Uses JSON-C and CURL libs to send an event to an ElasticSearch server
+    Uses JSON-C and CURL libs to send an event to an ElasticSearch server.
+
+    *NOTE: Because it basically just sends a JSON with the event info using CURL, it can be used to send event to any URL, not only to an elasticsearch server.
+    You can therefore use it to send events to any other system you may have.*
 ### Ini settings
 
 <table>

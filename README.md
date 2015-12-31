@@ -283,8 +283,8 @@ All available backends are under the storage dir, config and build instructions 
 ## elasticsearch
     Uses JSON-C and CURL libs to send an event to an ElasticSearch server.
 
-    *NOTE: Because it basically just sends a JSON with the event info using CURL, it can be used to send event to any URL, not only to an elasticsearch server.
-    You can therefore use it to send events to any other system you may have.*
+    NOTE: Because it basically just sends a JSON with the event info using CURL, it can be used to send event to any URL, not only to an elasticsearch server.
+    You can therefore use it to send events to any other system you may have.
 ### Ini settings
 
 <table>

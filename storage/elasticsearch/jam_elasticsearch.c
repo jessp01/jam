@@ -118,7 +118,7 @@ PHP_JAM_GET_FUNC(elasticsearch)
 
 PHP_JAM_STORE_FUNC(elasticsearch)
 {
-    zval **ppzval;					    /* will hold the error message */
+    zval *ppzval;					    /* will hold the error message */
     CURL *ch;                                               /* curl handle */
     CURLcode rcode;                                         /* curl result code */
     char hostname[255];
@@ -147,8 +147,8 @@ PHP_JAM_STORE_FUNC(elasticsearch)
     /* create json object for post */
     json = json_object_new_object();
     /* build post data */
-    if (zend_hash_find(Z_ARRVAL_P(event), "error_message", sizeof("error_message"), (void **) &ppzval) == SUCCESS) {
-	json_object_object_add(json, "error", json_object_new_string(Z_STRVAL_PP(ppzval)));
+    if ((ppzval = zend_hash_str_find(Z_ARRVAL_P(event), "error_message", sizeof("error_message")-1)) != NULL) {
+	json_object_object_add(json, "error", json_object_new_string(Z_STRVAL_P(ppzval)));
     } else {
 	json_object_object_add(json, "error", json_object_new_string("No error message"));
     }

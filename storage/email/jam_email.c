@@ -41,12 +41,12 @@ PHP_JAM_GET_FUNC(email)
 
 PHP_JAM_STORE_FUNC(email)
 {
-	zval *fname, *args[3], *retval, **ppzval;
+	zval fname, args[3], retval, *ppzval;
 
 	/*
 		Error body
 	*/
-	MAKE_STD_ZVAL(args[2]);
+	//MAKE_STD_ZVAL(args[2]);
 #if ZEND_MODULE_API_NO <= PHP_5_3_X_API_NO
 	php_start_ob_buffer(NULL, 4096, 0 TSRMLS_CC);
 #else
@@ -57,10 +57,10 @@ PHP_JAM_STORE_FUNC(email)
 #if ZEND_MODULE_API_NO <= PHP_5_3_X_API_NO
 	if (php_ob_get_buffer(args[2] TSRMLS_CC) == FAILURE) {
 #else
-	if (php_output_get_contents(args[2] TSRMLS_CC) == FAILURE) {
+	if (php_output_get_contents(&args[2] TSRMLS_CC) == FAILURE) {
 #endif
-		zval_dtor(args[2]);
-		FREE_ZVAL(args[2]);
+		//zval_dtor(args[2]);
+		//FREE_ZVAL(args[2]);
 		
 #if ZEND_MODULE_API_NO <= PHP_5_3_X_API_NO
 		php_end_ob_buffer(0, 0 TSRMLS_CC);
@@ -76,43 +76,46 @@ PHP_JAM_STORE_FUNC(email)
 		php_output_end();
 #endif
 
-	MAKE_STD_ZVAL(fname);
-	ZVAL_STRING(fname, "mail", 1);
+	//MAKE_STD_ZVAL(fname);
+	ZVAL_STRING(&fname, "mail");
 
 	/*
 		Recipient
 	*/
-	MAKE_STD_ZVAL(args[0]);
-	ZVAL_STRING(args[0], JAM_EMAIL_G(to_address), 1);
+	//MAKE_STD_ZVAL(args[0]);
+	ZVAL_STRING(&args[0], JAM_EMAIL_G(to_address));
+	//ZVAL_COPY_VALUE(&args[0], &JAM_EMAIL_G(to_address));
 
 	/*
 		Subject
 	*/
-	MAKE_STD_ZVAL(args[1]);
+	//MAKE_STD_ZVAL(args[1]);
 
-	if (zend_hash_find(Z_ARRVAL_P(event), "error_message", sizeof("error_message"), (void **) &ppzval) == SUCCESS) {
-		ZVAL_STRING(args[1], Z_STRVAL_PP(ppzval), 1);
+	//if (zend_hash_find(Z_ARRVAL_P(event), "error_message", sizeof("error_message"), (void **) &ppzval) == SUCCESS) {
+	if ((ppzval = zend_hash_str_find(Z_ARRVAL_P(event), "error_message", sizeof("error_message")-1)) != NULL) {
+		ZVAL_STRING(&args[1], Z_STRVAL_P(ppzval));
+		//ZVAL_COPY_VALUE(&args[1], Z_STRVAL_P(ppzval));
 	} else {
-		ZVAL_STRING(args[1], "Aware: No error message", 1);
+		ZVAL_STRING(&args[1], "Aware: No error message");
 	}
 
-	MAKE_STD_ZVAL(retval);
-	call_user_function(EG(function_table), NULL, fname, retval, 3, args TSRMLS_CC);
+	//MAKE_STD_ZVAL(retval);
+	call_user_function(EG(function_table), NULL, &fname, &retval, 3, args);
 
-	zval_dtor(fname);
-	FREE_ZVAL(fname);
+	zval_dtor(&fname);
+	FREE_ZVAL(&fname);
 
-	zval_dtor(retval);
-	FREE_ZVAL(retval);
+	zval_dtor(&retval);
+	FREE_ZVAL(&retval);
 
-	zval_dtor(args[0]);
-	FREE_ZVAL(args[0]);
+	zval_dtor(&args[0]);
+	FREE_ZVAL(&args[0]);
 
-	zval_dtor(args[1]);
-	FREE_ZVAL(args[1]);
+	zval_dtor(&args[1]);
+	FREE_ZVAL(&args[1]);
 
-	zval_dtor(args[2]);
-	FREE_ZVAL(args[2]);
+	zval_dtor(&args[2]);
+	FREE_ZVAL(&args[2]);
 	
 	return AwareOperationSuccess;
 }

@@ -28,6 +28,7 @@
 #include "zend_ini_scanner.h"
 #include "zend_language_scanner.h"
 #include <zend_language_parser.h>
+#include "zend_API.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(jam)
 
@@ -146,7 +147,6 @@ PHP_FUNCTION(__jam_error_handler_callback)
 		}
 		
 		jam_printf("Invoking error handler: %s\n", Z_STRVAL_P(JAM_G(user_error_handler)));
-		//php_jam_invoke_handler(Z_LVAL_P(args[0]) , Z_STRVAL_P(args[2]), Z_LVAL_P(args[3]), Z_STRVAL_P(args[1]));
 		php_jam_invoke_handler(Z_RES(args[0])->handle, Z_STRVAL(args[2]), Z_RES(args[3])->handle,Z_STRVAL(args[1]));
 		call_user_function(EG(function_table), NULL, JAM_G(user_error_handler), &retval, 5, args);
 	}
@@ -159,7 +159,6 @@ PHP_FUNCTION(jam_set_error_handler)
 		JAM_G(orig_set_error_handler)(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
 		/* Take the user error handler and push to our stack */
-		//if (EG(user_error_handler)) {
 		if (Z_TYPE(EG(user_error_handler)) != IS_UNDEF){
 			zval *tmp;
 			
@@ -176,7 +175,7 @@ PHP_FUNCTION(jam_set_error_handler)
 				ZVAL_STRING(return_value, Z_STRVAL_P(old_handler));
 			}
 			
-			ALLOC_INIT_ZVAL(tmp);
+			//ALLOC_INIT_ZVAL(tmp);
 			ZVAL_STRING(tmp, Z_STRVAL(EG(user_error_handler)));
 
 			/* free previous error handler */
@@ -185,20 +184,20 @@ PHP_FUNCTION(jam_set_error_handler)
 				//FREE_ZVAL(JAM_G(user_error_handler));
 			}
 			
-			ALLOC_INIT_ZVAL(JAM_G(user_error_handler));
+			//ALLOC_INIT_ZVAL(JAM_G(user_error_handler));
 			ZVAL_STRING(JAM_G(user_error_handler), Z_STRVAL(EG(user_error_handler)));
 
 			/* Create a new handler */
 			zend_ptr_stack_push(&JAM_G(user_error_handlers), tmp);
 
-			//zval_dtor(EG(user_error_handler));
+			zval_dtor_ptr(EG(user_error_handler));
 			//zval_string_release(EG(user_error_handler));
 			//ZVAL_STRING(EG(user_error_handler), "__jam_error_handler_callback");
-			ZVAL_UNDEF(&EG(user_error_handler));
+			//ZVAL_UNDEF(&EG(user_error_handler));
 			//EG(user_error_handler) = __jam_error_handler_callback;
 
 		} else {
-			zval_ptr_dtor(JAM_G(user_error_handler));
+			zval_ptr_dtor(&JAM_G(user_error_handler));
 			FREE_ZVAL(JAM_G(user_error_handler));
 			JAM_G(user_error_handler) = NULL;
 		}
@@ -211,7 +210,7 @@ PHP_FUNCTION(jam_restore_error_handler)
 		JAM_G(orig_restore_error_handler)(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
 		if (JAM_G(user_error_handler)) {
-			zval_ptr_dtor(JAM_G(user_error_handler));
+			zval_ptr_dtor(&JAM_G(user_error_handler));
 			//FREE_ZVAL(JAM_G(user_error_handler));
 			JAM_G(user_error_handler) = NULL;
 		}
@@ -228,11 +227,12 @@ PHP_FUNCTION(jam_restore_error_handler)
 				zend_ptr_stack_push(&JAM_G(user_error_handlers), tmp);
 				
 				if (JAM_G(user_error_handler)) {
-					zval_ptr_dtor(JAM_G(user_error_handler));
+					zval_ptr_dtor(&JAM_G(user_error_handler));
 					//FREE_ZVAL(JAM_G(user_error_handler));
 				}
-				ALLOC_INIT_ZVAL(JAM_G(user_error_handler));
+				//ALLOC_INIT_ZVAL(JAM_G(user_error_handler));
 				ZVAL_STRING(JAM_G(user_error_handler), Z_STRVAL_P(tmp));
+				efree(tmp);
 			}
 		}
 	}
@@ -240,22 +240,17 @@ PHP_FUNCTION(jam_restore_error_handler)
 
 static void _add_assoc_zval_helper(zval *event, char *name, uint name_len TSRMLS_DC)
 {	
-	zval *ppzval;
-	
+	zval *ppzval = NULL;
 	if (PG(auto_globals_jit)) {
-//		zend_is_auto_global(name);
 		zend_is_auto_global_str(ZEND_STRL(name));
 	}
 	
-//	if (zend_hash_find(&EG(symbol_table), name, name_len, (void **) &ppzval) == SUCCESS) {
-	//zend_string *server = zend_string_init(name, sizeof(name) - 1, 0);
-//	if ((ppzval = zend_hash_find(&EG(symbol_table),server)) != NULL) {
 	if ((ppzval = zend_hash_str_find(&EG(symbol_table), name, sizeof(name)-1)) != NULL) {
 		/* Make sure that freeing jam_array doesn't destroy superglobals */
 		if (Z_REFCOUNTED_P(ppzval)) {
 		    Z_ADDREF_P(ppzval);
 		}
-		add_assoc_zval(event, name, ppzval);
+		add_assoc_zval(&event, name, ppzval);
 	}	
 }
 
@@ -308,31 +303,31 @@ void php_jam_capture_error_ex(zval *event, int type, const char *error_filename,
 	/* Capture backtrace */
 	if (JAM_G(log_backtrace)) {
 		zval *btrace;
-		ALLOC_INIT_ZVAL(btrace);
+		//ALLOC_INIT_ZVAL(btrace);
 #if PHP_API_VERSION <= PHP_5_3_X_API_NO
 		zend_fetch_debug_backtrace(btrace, 0, 0 );
 #else
 // TODO: introduce a directive for the amount of stack frames returned instead of hard coded 1000?
-		zend_fetch_debug_backtrace(btrace, 0, 0 ,1000);
+		zend_fetch_debug_backtrace(&btrace, 0, 0 ,1000);
 #endif
-		add_assoc_zval(event, "backtrace", btrace);
+		add_assoc_zval(&event, "backtrace", &btrace);
 	}
 	
 	va_copy(args_cp, args);
 	len = vspprintf(&buffer, PG(log_errors_max_len), format, args_cp);
 	va_end(args_cp);
 
-	add_assoc_string(event,	"error_message", buffer);
-	add_assoc_string(event,	"filename",	(char *)error_filename);
+	add_assoc_string(&event,	"error_message", buffer);
+	add_assoc_string(&event,	"filename",	(char *)error_filename);
 	
-	add_assoc_long(event, "line_number", error_lineno);
-	add_assoc_long(event, "error_type", type);
+	add_assoc_long(&event, "line_number", error_lineno);
+	add_assoc_long(&event, "error_type", type);
 	
 	/*
 		Set the last logged uuid into _SERVER
 	*/
-	add_assoc_string(event, "jam_event_uuid", uuid_str);
-	add_assoc_long(event, "jam_event_time", time(NULL));
+	add_assoc_string(&event, "jam_event_uuid", uuid_str);
+	add_assoc_long(&event, "jam_event_time", time(NULL));
 
 	/*
 		Set the last logged uuid into _SERVER
@@ -355,8 +350,8 @@ static void php_jam_user_event_trigger(int type TSRMLS_DC, const char *error_fil
 	zval *event;
 	va_list args;
 
-	ALLOC_INIT_ZVAL(event);
-	array_init(event);
+	//ALLOC_INIT_ZVAL(event);
+	ZVAL_NEW_ARR(event);
 	
 	add_assoc_bool_ex(event, "jam_event_trigger", sizeof("jam_event_trigger") - 1, 0);
 	
@@ -370,8 +365,8 @@ void php_jam_invoke_handler(int type TSRMLS_DC, const char *error_filename, cons
 	zval *event;
 	va_list args;
 
-	ALLOC_INIT_ZVAL(event);
-	array_init(event);
+	//ALLOC_INIT_ZVAL(event);
+	//array_init(event);
 	
 	va_start(args, format);
 	php_jam_capture_error_ex(event, type, error_filename, error_lineno, 1, format, args );
@@ -395,6 +390,7 @@ static void php_jam_display_error_page(char *filename)
 /* Wrapper that calls the original callback or our callback */
 void php_jam_capture_error(int type, const char *error_filename, const uint error_lineno, const char *format, va_list args)
 {
+
 	TSRMLS_FETCH();
 	
 	/* Assume that display_errors if off */
@@ -406,9 +402,7 @@ void php_jam_capture_error(int type, const char *error_filename, const uint erro
 	
 	if (type & JAM_G(log_level)) {
 		zval *event;
-
-		ALLOC_INIT_ZVAL(event);
-		array_init(event);
+		array_init(&event);
 
 		php_jam_capture_error_ex(event, type, error_filename, error_lineno, 1, format, args );
 		JAM_G(orig_error_cb)(type, error_filename, error_lineno, format, args);
@@ -466,8 +460,6 @@ void php_jam_ini_parser_cb(zval *arg1, zval *arg2, zval *arg3, int callback_type
 	level    = malloc(sizeof(long));
 	*level   = atol(Z_STRVAL_P(arg2));
 
-//	if (zend_hash_update(&JAM_G(module_error_reporting), mod_name, strlen(mod_name) + 1, &level, sizeof(long), NULL) == FAILURE) {
-//	if (zend_hash_update_ptr(EG(class_table), Z_STR_P(key), ce)) != NULL) {
 	zend_hash_update(&JAM_G(module_error_reporting), mod, arg2);
 		//free(level);
 	//}
@@ -599,14 +591,11 @@ static void php_jam_override_error_handling(TSRMLS_D)
 	JAM_G(orig_error_cb) = zend_error_cb;
 	zend_error_cb          =& php_jam_capture_error;
 	
-	//if (zend_hash_find(EG(function_table), "set_error_handler", sizeof("set_error_handler"), (void **)&orig_set_error_handler) == SUCCESS) {
-	//
-	if ((orig_set_error_handler = zend_hash_str_find(EG(function_table), "set_error_handler", sizeof("set_error_handler")-1)) != NULL) {
+	if ((orig_set_error_handler = (zend_function *)zend_hash_str_find_ptr(EG(function_table), "set_error_handler", sizeof("set_error_handler")-1)) != NULL) {
 		JAM_G(orig_set_error_handler) = orig_set_error_handler->internal_function.handler;
 		orig_set_error_handler->internal_function.handler = zif_jam_set_error_handler;
 	}
-	//if (zend_hash_find(EG(function_table), "restore_error_handler", sizeof("restore_error_handler"), (void **)&orig_restore_error_handler) == SUCCESS) {
-	if ((orig_restore_error_handler = zend_hash_str_find(EG(function_table), "restore_error_handler", sizeof("restore_error_handler")-1)) != NULL) {
+	if ((orig_restore_error_handler = (zend_function *)zend_hash_str_find_ptr(EG(function_table), "restore_error_handler", sizeof("restore_error_handler")-1)) != NULL) {
 		JAM_G(orig_restore_error_handler) = orig_restore_error_handler->internal_function.handler;
 		orig_restore_error_handler->internal_function.handler = zif_jam_restore_error_handler;
 	}
@@ -643,12 +632,10 @@ static void php_jam_restore_error_handling(TSRMLS_D)
 		//FREE_ZVAL(JAM_G(user_error_handler));
 	}
 	
-	//if (zend_hash_find(EG(function_table), "set_error_handler", sizeof("set_error_handler"), (void **)&orig_set_error_handler) == SUCCESS) {
-	if ((orig_set_error_handler = zend_hash_str_find(EG(function_table), "set_error_handler", sizeof("set_error_handler")-1)) != NULL) {
+	if ((orig_set_error_handler= (zend_function *)zend_hash_str_find_ptr(EG(function_table), "set_error_handler", sizeof("set_error_handler")-1)) != NULL) {
 		orig_set_error_handler->internal_function.handler = JAM_G(orig_set_error_handler);
 	}
-	//if (zend_hash_find(EG(function_table), "restore_error_handler", sizeof("restore_error_handler"), (void **)&orig_restore_error_handler) == SUCCESS) {
-	if ((orig_restore_error_handler = zend_hash_str_find(EG(function_table), "restore_error_handler", sizeof("restore_error_handler")-1)) != NULL) {
+	if ((orig_restore_error_handler = (zend_function *)zend_hash_str_find_ptr(EG(function_table), "restore_error_handler", sizeof("restore_error_handler")-1)) != NULL) {
 		orig_restore_error_handler->internal_function.handler = JAM_G(orig_restore_error_handler);
 	}
 }

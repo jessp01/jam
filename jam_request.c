@@ -50,10 +50,10 @@ static void php_jam_capture_slow_request(long elapsed, long threshold, double u_
 	va_list args;
 	zval *event, *slow_request;
 	
-	ALLOC_INIT_ZVAL(event);
+	//ALLOC_INIT_ZVAL(event);
 	array_init(event);
 	
-	ALLOC_INIT_ZVAL(slow_request);
+	//ALLOC_INIT_ZVAL(slow_request);
 	array_init(slow_request);
 	
 	add_assoc_long(slow_request, "time_elapsed", elapsed);
@@ -124,10 +124,10 @@ static void php_jam_capture_memory_usage(long peak, long threshold, const char *
 	va_list args;
 	zval *event, *peak_usage;
 	
-	ALLOC_INIT_ZVAL(event);
+	//ALLOC_INIT_ZVAL(event);
 	array_init(event);
 	
-	ALLOC_INIT_ZVAL(peak_usage);
+	//ALLOC_INIT_ZVAL(peak_usage);
 	array_init(peak_usage);
 
 	add_assoc_long(peak_usage, "memory_peak_usage", peak);

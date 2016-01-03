@@ -34,7 +34,8 @@
 
 /* {{{ void php_jam_capture_error_ex(zval *, int, const char *, const uint, zend_bool, const char *, va_list);
 */
-void php_jam_capture_error_ex(zval *, int, const char *, const uint, zend_bool, const char *, va_list);
+void php_jam_capture_error_ex(int, const char *, const uint, zend_bool, const char *, va_list);
+//void php_jam_capture_error_ex(zval *, int, const char *, const uint, zend_bool, const char *, va_list);
 /* }}} */
 
 /* {{{ void php_jam_invoke_handler(int TSRMLS_DC, const char *, const uint, const char *, ...);

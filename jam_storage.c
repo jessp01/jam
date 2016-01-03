@@ -41,26 +41,24 @@ static php_jam_storage_module *php_jam_storage_modules[MAX_MODULES + 1] = { 0 };
 static zend_bool php_jam_storage_module_is_configured(const char *mod_name TSRMLS_DC) 
 {
 	zend_bool retval = 0;
-	char *pch, *last, *ptr;
+	char *pch, *last, *storage_modules;
 	
 	/* If jam is not enabled, don't register anything */
 	if (!JAM_G(enabled)) {
 		return 0;
 	}
-
-	ptr = estrdup(JAM_G(storage_modules));
-	pch = php_strtok_r(ptr, ",", &last);
+	storage_modules=JAM_G(storage_modules);
+	pch = php_strtok_r(storage_modules, ",", &last);
 
 	while (pch != NULL) {
-		zend_string *z_pch = zend_string_init(pch, sizeof(pch) - 1, 0);
-		zend_string *mod = php_trim(z_pch, NULL,0, 3);
+		//z_pch = zend_string_init(pch, sizeof(pch) - 1, 0);
+		//mod = php_trim(z_pch, NULL, 0, 3);
 		
 		
-		if (mod->val) {
-			if (!strcmp(mod->val, mod_name)) {
+		if (pch) {
+			if (!strcmp(pch, mod_name)) {
 				retval = 1;
 			}
-			zend_string_release(mod);
 		}
 		
 		/* all done ? */
@@ -69,8 +67,6 @@ static zend_bool php_jam_storage_module_is_configured(const char *mod_name TSRML
 		
 		pch = php_strtok_r(NULL, ",", &last);
 	}
-	
-	efree(ptr);
 	return retval;
 }
 /* }}} */
@@ -184,12 +180,14 @@ void php_jam_storage_store(php_jam_storage_module *mod, const char *uuid, zval *
 		store events of this level. 
 	*/
 	if (zend_hash_num_elements(&JAM_G(module_error_reporting)) > 0) {
-		long **level;
+		//long **level;
+		zval *level;
 		/* This means that we might have overriden error reporting level */
 		//if (zend_hash_find(&JAM_G(module_error_reporting), mod->name, strlen(mod->name) + 1, (void **)&level) == SUCCESS) {
 		if ((level = zend_hash_str_find(&JAM_G(module_error_reporting), mod->name, sizeof(mod->name)-1)) != NULL) {
 			/* Check if module is configured for this sort of errors */
-			if (!(**level & type)) {
+			//if (!(**level & type)) {
+			if (!(Z_LVAL_P(level) & type)) {
 				return;
 			}
 		}

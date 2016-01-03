@@ -51,7 +51,7 @@ static void php_jam_capture_slow_request(long elapsed, long threshold, double u_
 	zval *event, *slow_request;
 	
 	//ALLOC_INIT_ZVAL(event);
-	array_init(event);
+	//array_init(event);
 	
 	//ALLOC_INIT_ZVAL(slow_request);
 	array_init(slow_request);
@@ -67,7 +67,7 @@ static void php_jam_capture_slow_request(long elapsed, long threshold, double u_
 	add_assoc_zval(event, "_JAM_REQUEST", slow_request);
 
 	va_start(args, format);
-	php_jam_capture_error_ex(event, E_CORE_WARNING, "jam internal report", 0, 1, format, args);
+	php_jam_capture_error_ex(E_CORE_WARNING, "jam internal report", 0, 1, format, args);
 	va_end(args);
 }
 /* }}} */
@@ -137,7 +137,7 @@ static void php_jam_capture_memory_usage(long peak, long threshold, const char *
 	add_assoc_bool(event, "excessive_memory_usage", 1);
 
 	va_start(args, format);
-	php_jam_capture_error_ex(event, E_CORE_WARNING, "jam internal report", 0, 1, format, args);
+	php_jam_capture_error_ex(E_CORE_WARNING, "jam internal report", 0, 1, format, args);
 	va_end(args);
 }
 /* }}} */

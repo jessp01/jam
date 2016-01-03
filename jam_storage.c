@@ -20,6 +20,7 @@
 #include "php_jam_storage.h"
 
 #include "ext/standard/php_var.h"
+#include "zend_smart_str.h"
 #include "ext/standard/php_smart_string.h"
 #include "ext/standard/php_string.h"
 
@@ -130,9 +131,9 @@ void php_jam_storage_module_list(zval *return_value)
 }
 /* }}} */
 
-/* {{{ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_string *data_var)
+/* {{{ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var)
 */
-MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_string *data_var)
+MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var)
 {
 	php_serialize_data_t var_hash;
 	
@@ -143,7 +144,7 @@ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, sma
 	}
 
 	PHP_VAR_SERIALIZE_INIT(var_hash);
-	php_var_serialize(data_var, &event, &var_hash TSRMLS_CC);
+	php_var_serialize(data_var, event, &var_hash TSRMLS_CC);
     PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
 	if (JAM_G(use_cache)) {
@@ -163,7 +164,7 @@ MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *string, int str
 	p = s = (const unsigned char *)string;
 	
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
-	unserialized = php_var_unserialize(&retval, (const unsigned char **)&p, (const unsigned char *) s + string_len, &var_hash TSRMLS_CC);
+	unserialized = php_var_unserialize(retval, (const unsigned char **)&p, (const unsigned char *) s + string_len, &var_hash TSRMLS_CC);
 	PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
 	
 	return unserialized;

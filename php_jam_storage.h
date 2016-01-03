@@ -104,9 +104,9 @@ zend_bool php_jam_storage_delete(const char *mod_name, const char *uuid TSRMLS_D
 void php_jam_storage_module_list(zval *return_value);
 /* }}} */
 
-/* {{{ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_string *data_var TSRMLS_DC);
+/* {{{ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var TSRMLS_DC);
 */
-MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_string *data_var);
+MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var);
 /* }}} */
 
 /* {{{ MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *, int , zval * TSRMLS_DC);

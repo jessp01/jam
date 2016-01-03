@@ -52,7 +52,7 @@ PHP_JAM_STORE_FUNC(email)
 #else
 	php_output_start_user(NULL, 4096, PHP_OUTPUT_HANDLER_STDFLAGS);
 #endif
-	php_var_dump(&event, JAM_G(depth) TSRMLS_CC);
+	php_var_dump(event, JAM_G(depth) TSRMLS_CC);
 
 #if ZEND_MODULE_API_NO <= PHP_5_3_X_API_NO
 	if (php_ob_get_buffer(argies[2] TSRMLS_CC) == FAILURE) {

@@ -30,6 +30,7 @@
 #include <zend_language_parser.h>
 #include "zend_API.h"
 
+
 ZEND_DECLARE_MODULE_GLOBALS(jam)
 
 static void php_jam_user_event_trigger(int type TSRMLS_DC, const char *error_filename, const uint error_lineno, const char *format, ...);
@@ -138,9 +139,7 @@ PHP_FUNCTION(jam_storage_module_list)
 PHP_FUNCTION(__jam_error_handler_callback)
 {
 	if (JAM_G(user_error_handler)) {
-		zval retval;
-		//zval *args = safe_emalloc(5, sizeof(zval), 0);
-		zval args[5];
+		zval args[5], retval;
 
 		if (zend_parse_parameters(ZEND_NUM_ARGS(), "zz|zzz", args[0], args[1], args[2], args[3], args[4]) != SUCCESS) {
 			return;
@@ -180,7 +179,7 @@ PHP_FUNCTION(jam_set_error_handler)
 
 			/* free previous error handler */
 			if (JAM_G(user_error_handler)) {
-				zval_ptr_dtor(JAM_G(user_error_handler));
+				//zval_ptr_dtor(JAM_G(user_error_handler));
 				//FREE_ZVAL(JAM_G(user_error_handler));
 			}
 			
@@ -229,7 +228,6 @@ PHP_FUNCTION(jam_restore_error_handler)
 				}
 				//ALLOC_INIT_ZVAL(JAM_G(user_error_handler));
 				ZVAL_STRING(JAM_G(user_error_handler), Z_STRVAL_P(tmp));
-				efree(tmp);
 			}
 		}
 	}
@@ -253,9 +251,8 @@ static void _add_assoc_zval_helper(zval *event, char *name, uint name_len TSRMLS
 /* event must be initialized with MAKE_STD_ZVAL or similar and array_init before sending here */
 void php_jam_capture_error_ex(int type, const char *error_filename, const uint error_lineno, zend_bool free_event, const char *format, va_list args TSRMLS_DC)
 {
-	zval *event;
+	zval *event,*ppzval=NULL;
 	array_init(event);
-	zval *ppzval;
 	va_list args_cp;
 	int len;
 	char *buffer;
@@ -457,9 +454,9 @@ void php_jam_ini_parser_cb(zval *arg1, zval *arg2, zval *arg3, int callback_type
 	level    = malloc(sizeof(long));
 	*level   = atol(Z_STRVAL_P(arg2));
 
-	zend_hash_update(&JAM_G(module_error_reporting), mod, arg2);
-		//free(level);
-	//}
+	if (zend_hash_update(&JAM_G(module_error_reporting), mod, arg2) !=NULL){
+	    free(level);
+	}
 }
 
 static PHP_INI_MH(OnUpdateModuleErrorReporting) 
@@ -625,7 +622,7 @@ static void php_jam_restore_error_handling(TSRMLS_D)
 	
 	if (JAM_G(user_error_handler)) {
 		//zval_dtor(JAM_G(user_error_handler));
-		zval_ptr_dtor(JAM_G(user_error_handler));
+		//zval_ptr_dtor(JAM_G(user_error_handler));
 		//FREE_ZVAL(JAM_G(user_error_handler));
 	}
 	

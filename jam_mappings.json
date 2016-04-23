@@ -1,0 +1,30 @@
+	{"mappings":
+		{"log":
+			{"properties":
+				{
+					"error":{
+						"type":"string",
+						"index" : "not_analyzed"
+					},
+					"error_type":{
+						"type":"long"
+					},
+					"file":{
+						"type":"string",
+						"index" : "not_analyzed"
+					},
+					"hostname":{
+						"type":"string",
+						"index" : "not_analyzed"
+					},
+					"source":{
+						"type":"string"
+					},
+					"timestamp":{
+						"type":"date",
+						"format" : "strict_date_optional_time|| epoch_second "
+					}
+				}
+			}
+		}
+	}

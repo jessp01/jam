@@ -293,7 +293,7 @@ See [jam_mappings.json](jam_mappings.json)
 
 To create initial fields mappings for it, use:
 ```
-$ curl -X PUT 'jam_elasticsearch.host:9200/jam' -d @mappings.json
+$ curl -X PUT 'jam_elasticsearch.host:9200/jam' -d @jam_mappings.json
 ```
 
 ### Ini settings

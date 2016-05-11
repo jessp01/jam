@@ -282,16 +282,16 @@ All available backends are under the storage dir, config and build instructions 
 # Storage backends 
 
 ## elasticsearch
-    Uses JSON-C and CURL libs to send an event to an ElasticSearch server.
+Uses JSON-C and CURL libs to send an event to an ElasticSearch server.
 
-    NOTE: Because it basically just sends a JSON with the event info using CURL, it can be used to send event to any URL, not only to an elasticsearch server.
-    You can therefore use it to send events to any other system you may have.
+NOTE: Because it basically just sends a JSON with the event info using CURL, it can be used to send event to any URL, not only to an elasticsearch server.
+You can therefore use it to send events to any other system you may have.
 
 ### Bootstrapping
-    JaM stores its event under the 'jam' index.
-    See [jam_mappings.json] (jam_mappings.json)
+JaM stores its event under the 'jam' index.
+See [jam_mappings.json](jam_mappings.json)
 
-    To create initial fields mappings for it, use:
+To create initial fields mappings for it, use:
 ```
 $ curl -X PUT 'jam_elasticsearch.host:9200/jam' -d @mappings.json
 ```

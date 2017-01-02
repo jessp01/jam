@@ -296,6 +296,12 @@ To create initial fields mappings for it, use:
 $ curl -X PUT 'jam_elasticsearch.host:9200/jam' -d @jam_mappings.json
 ```
 
+Assuning the [default jam_mappings.json] (jam_mappings.json) is used, then the value for the jam_elasticsearch.host should be:
+```
+jam_elasticsearch.host="http://YOUR_ES_HOST:9200/jam/log"
+```
+
+
 ### Ini settings
 
 <table>

@@ -20,8 +20,9 @@
 # define _PHP_JAM_STORAGE_H_
 
 #include "php_jam.h"
-#include "ext/standard/php_smart_string.h"
+//#include "zend_smart_string.h"
 #include "zend_smart_str.h"
+#include "ext/standard/php_string.h"
 
 /* {{{ define the string length of the uuid
 */
@@ -111,7 +112,7 @@ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, sma
 
 /* {{{ MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *, int , zval * TSRMLS_DC);
 */
-MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *, int , zval * TSRMLS_DC);
+MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *, zend_string * , zval * TSRMLS_DC);
 /* }}} */
 
 /* {{{ MY_JAM_EXPORTS AwareModuleRegisterStatus php_jam_register_storage_module(php_jam_storage_module * TSRMLS_DC);

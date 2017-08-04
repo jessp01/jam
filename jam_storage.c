@@ -20,8 +20,6 @@
 #include "php_jam_storage.h"
 
 #include "ext/standard/php_var.h"
-#include "zend_smart_str.h"
-#include "ext/standard/php_smart_string.h"
 #include "ext/standard/php_string.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(jam)
@@ -131,7 +129,7 @@ void php_jam_storage_module_list(zval *return_value)
 }
 /* }}} */
 
-/* {{{ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var)
+/* {{{ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_string *data_var)
 */
 MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, smart_str *data_var)
 {
@@ -155,7 +153,7 @@ MY_JAM_EXPORTS void php_jam_storage_serialize(const char *uuid, zval *event, sma
 
 /* {{{ MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *string, int string_len, zval *retval TSRMLS_DC)
 */
-MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *string, int string_len, zval *retval TSRMLS_DC)
+MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *string, zend_string *string_len, zval *retval TSRMLS_DC)
 {
 	zend_bool unserialized;
 	php_unserialize_data_t var_hash;
@@ -164,7 +162,7 @@ MY_JAM_EXPORTS zend_bool php_jam_storage_unserialize(const char *string, int str
 	p = s = (const unsigned char *)string;
 	
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
-	unserialized = php_var_unserialize(retval, (const unsigned char **)&p, (const unsigned char *) s + string_len, &var_hash TSRMLS_CC);
+	unserialized = php_var_unserialize(retval, (const unsigned char **)&p, (const unsigned char *) s + string_len->len, &var_hash TSRMLS_CC);
 	PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
 	
 	return unserialized;
@@ -184,14 +182,14 @@ void php_jam_storage_store(php_jam_storage_module *mod, const char *uuid, zval *
 		//long **level;
 		zval *level;
 		/* This means that we might have overriden error reporting level */
-		//if (zend_hash_find(&JAM_G(module_error_reporting), mod->name, strlen(mod->name) + 1, (void **)&level) == SUCCESS) {
 		if ((level = zend_hash_str_find(&JAM_G(module_error_reporting), mod->name, sizeof(mod->name)-1)) != NULL) {
 			/* Check if module is configured for this sort of errors */
-			//if (!(**level & type)) {
 			if (!(Z_LVAL_P(level) & type)) {
+				//zval_dtor(level);
 				return;
 			}
 		}
+		//zval_dtor(level);
 	}
 	
 	/* Connect failed, report error and bail out */

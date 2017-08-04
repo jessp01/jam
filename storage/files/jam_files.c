@@ -17,6 +17,7 @@
 */
 
 #include "php_jam_files.h"
+#include "zend_smart_str.h"
 #include "ext/standard/php_filestat.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(jam_files)
@@ -34,7 +35,7 @@ PHP_JAM_GET_FUNC(files)
 {
 	char filename[MAXPATHLEN], *buff;
 	php_stream *stream;
-	size_t buff_size;
+	smart_str *buff_size;
 	zend_bool status;
 
 	if (snprintf(filename, MAXPATHLEN, "%s/%s.jam", JAM_FILES_G(storage_path), uuid) <= 0) {
@@ -43,20 +44,20 @@ PHP_JAM_GET_FUNC(files)
 	
 	jam_printf("Filename: %s\n", filename);
 	
-	stream = php_stream_open_wrapper(filename, "r", ENFORCE_SAFE_MODE & ~REPORT_ERRORS, NULL);
+	stream = php_stream_open_wrapper(filename, "r", USE_PATH | REPORT_ERRORS, NULL);
 	
 	if (!stream) {
 		return AwareOperationFailed;
 	}
 	
-    buff_size = php_stream_copy_to_mem(stream, &buff, PHP_STREAM_COPY_ALL, 0);
+    buff_size->s = php_stream_copy_to_mem(stream, PHP_STREAM_COPY_ALL, 0);
 	php_stream_close(stream);
 
-    if (!buff_size) {
+    if (!buff_size->s) {
 		return AwareOperationFailed;
     }
 
-	status = php_jam_storage_unserialize(buff, buff_size, event TSRMLS_CC);
+	status = php_jam_storage_unserialize(buff, buff_size->s, event TSRMLS_CC);
 	efree(buff);
 	
 	if (!status) {
@@ -69,7 +70,7 @@ PHP_JAM_STORE_FUNC(files)
 {
 	char filename[MAXPATHLEN];
 	php_stream *stream;
-	smart_string string = {0};
+	smart_str string = {0};
 
 	if (snprintf(filename, MAXPATHLEN, "%s/%s.jam", JAM_FILES_G(storage_path), uuid) <= 0) {
 		return AwareOperationFailed;
@@ -77,7 +78,7 @@ PHP_JAM_STORE_FUNC(files)
 	
 	jam_printf("Storage filename: %s\n", filename);
 	
-	stream = php_stream_open_wrapper(filename, "w+", ENFORCE_SAFE_MODE & ~REPORT_ERRORS, NULL);
+	stream = php_stream_open_wrapper(filename, "w+", USE_PATH | REPORT_ERRORS, NULL);
 	
 	if (!stream) {
 		return AwareOperationFailed;
@@ -85,31 +86,31 @@ PHP_JAM_STORE_FUNC(files)
 	
 	php_jam_storage_serialize(uuid, event, &string TSRMLS_CC);
 	
-	if (php_stream_write(stream, string.c, string.len) < string.len) {
+	if (php_stream_write(stream, string.s->val, string.a) < string.a) {
 		php_stream_close(stream);
-		smart_str_free(&string);
+		smart_string_free(&string);
 		return AwareOperationFailed;
 	}
 	
 	php_stream_close(stream);
-	smart_str_free(&string);
+	smart_string_free(&string);
 	
 	return AwareOperationSuccess;
 }
 
 /* Just the uuid part of the full path */
-static int _php_jam_files_clean_path(zval **path TSRMLS_DC)
+static int _php_jam_files_clean_path(zval path TSRMLS_DC)
 {
-	if (Z_TYPE_PP(path) == IS_STRING && Z_STRLEN_PP(path) > PHP_JAM_UUID_LEN) {
+	if (Z_TYPE(path) == IS_STRING && Z_STRLEN(path) > PHP_JAM_UUID_LEN) {
 		char *ptr, buffer[PHP_JAM_UUID_LEN + 1];
 		memset(buffer, 0, PHP_JAM_UUID_LEN + 1);
 		
-		ptr = Z_STRVAL_PP(path) + (Z_STRLEN_PP(path) - 42);
+		ptr = Z_STRVAL(path) + (Z_STRLEN(path) - 42);
 		memcpy(buffer, ptr, PHP_JAM_UUID_LEN);
 		
 		buffer[PHP_JAM_UUID_LEN] = '\0';
-		efree(Z_STRVAL_PP(path));
-		ZVAL_STRING(*path, buffer, 1);
+		efree(Z_STRVAL(path));
+		ZVAL_STRING(&path, buffer);
 		
 		return ZEND_HASH_APPLY_KEEP;
 	}
@@ -122,17 +123,15 @@ static int php_jam_sort_mtime(const void *a, const void *b TSRMLS_DC) /* {{{ */
 	zval *first, *second, *stat_f, *stat_s;
 	int result;
 
-	f = *((Bucket **) a);
-	s = *((Bucket **) b);
+	f = (Bucket *) a;
+	s = (Bucket *) b;
 	
-	first = *((zval **) f->pData);
-	second = *((zval **) s->pData);
+	first = (zval *) f->h;
+	second = (zval *) s->h;
 	
 	convert_to_string(first);
 	convert_to_string(second);
 	
-	MAKE_STD_ZVAL(stat_f);
-	MAKE_STD_ZVAL(stat_s);
 	
 	php_stat(Z_STRVAL_P(first), Z_STRLEN_P(first), FS_MTIME, stat_f TSRMLS_CC);
 	php_stat(Z_STRVAL_P(second), Z_STRLEN_P(second), FS_MTIME, stat_s TSRMLS_CC);
@@ -140,10 +139,8 @@ static int php_jam_sort_mtime(const void *a, const void *b TSRMLS_DC) /* {{{ */
 	result = (Z_LVAL_P(stat_f) < Z_LVAL_P(stat_s));
 	
 	zval_dtor(stat_f);
-	FREE_ZVAL(stat_f);
 	
 	zval_dtor(stat_s);
-	FREE_ZVAL(stat_s);
 
 	return result;
 }
@@ -152,59 +149,49 @@ PHP_JAM_GET_LIST_FUNC(files)
 {
 	char path[MAXPATHLEN];
 	zval *fname;
-	zval *args[1];
+	zval args[1];
 
 	/* Use php glob */
-	MAKE_STD_ZVAL(fname);
-	ZVAL_STRING(fname, "glob", 1);
+	ZVAL_STRING(fname, "glob");
 
-	MAKE_STD_ZVAL(args[0]);
 	snprintf(path, MAXPATHLEN, "%s/*-*-*-*-*.jam", JAM_FILES_G(storage_path));
 	
-	ZVAL_STRING(args[0], path, 1);
+	ZVAL_STRING(&args[0], path);
 
 	call_user_function(EG(function_table), NULL, fname, events, 1, args TSRMLS_CC);
 	zval_dtor(fname);
-	FREE_ZVAL(fname);
 	
-	zval_dtor(args[0]);
-	FREE_ZVAL(args[0]);
+	zval_dtor(&args[0]);
 	
 	if (Z_TYPE_P(events) == IS_ARRAY) {
 		
-		if (zend_hash_sort(Z_ARRVAL_P(events), zend_qsort, php_jam_sort_mtime, 0 TSRMLS_CC) == FAILURE) {
+		if (zend_hash_sort(Z_ARRVAL_P(events), php_jam_sort_mtime, 0 TSRMLS_CC) == FAILURE) {
 			return AwareOperationFailed;
 		}
 		
 		if (zend_hash_num_elements(Z_ARRVAL_P(events)) > limit) {
 			
-			zval *slice_args[3], *events_copy;
+			zval slice_args[3];
+			zval *events_copy;
 		
-			MAKE_STD_ZVAL(fname);
-			ZVAL_STRING(fname, "array_slice", 1);
+			ZVAL_STRING(fname, "array_slice");
 
-			slice_args[0] = events;
+			slice_args[0] = *events;
 		
-			MAKE_STD_ZVAL(slice_args[1]);
-			ZVAL_LONG(slice_args[1], start);
+			ZVAL_LONG(&slice_args[1], start);
 		
-			MAKE_STD_ZVAL(slice_args[2]);
-			ZVAL_LONG(slice_args[2], limit);
+			ZVAL_LONG(&slice_args[2], limit);
 		
-			MAKE_STD_ZVAL(events_copy);
 			call_user_function(EG(function_table), NULL, fname, events_copy, 3, slice_args TSRMLS_CC);
 		
 			zval_dtor(fname);
-			FREE_ZVAL(fname);
 
 			zval_dtor(events);
 			ZVAL_ZVAL(events, events_copy, 1, 1);
 
-			zval_dtor(slice_args[1]);
-			FREE_ZVAL(slice_args[1]);
+			zval_dtor(&slice_args[1]);
 		
-			zval_dtor(slice_args[2]);
-			FREE_ZVAL(slice_args[2]);
+			zval_dtor(&slice_args[2]);
 		}
 		zend_hash_apply(Z_ARRVAL_P(events), (apply_func_t)_php_jam_files_clean_path TSRMLS_CC);
 	}
@@ -221,16 +208,14 @@ PHP_JAM_DELETE_FUNC(files)
 
 	path_len = snprintf(path, MAXPATHLEN, "%s/%s.jam", JAM_FILES_G(storage_path), uuid);
 	
-	MAKE_STD_ZVAL(stat);
 	php_stat(path, path_len, FS_IS_FILE, stat TSRMLS_CC);
 	
 	status = AwareOperationFailed;
 	
-	if (Z_BVAL_P(stat) && VCWD_UNLINK(path) == SUCCESS) {
+	if (VCWD_UNLINK(path) == SUCCESS) {
 		status = AwareOperationSuccess;
 	}
 	zval_dtor(stat);
-	FREE_ZVAL(stat);
 	return status;
 }
 
@@ -250,18 +235,17 @@ static void php_jam_files_init_globals(zend_jam_files_globals *jam_files_globals
 
 static zend_bool php_jam_files_startup_check(TSRMLS_D)
 {
-	zval *stat;
+	//char * storage=JAM_FILES_G(storage_path);
+	//const char *sto = "/tmp/jam";
+	zval stat;
 	zend_bool retval = 1;
+	php_stat(JAM_FILES_G(storage_path), strlen(JAM_FILES_G(storage_path)), FS_IS_DIR, &stat);
 
-	MAKE_STD_ZVAL(stat);
-	php_stat(JAM_FILES_G(storage_path), strlen(JAM_FILES_G(storage_path)), FS_IS_DIR, stat TSRMLS_CC);
-
-	if (Z_TYPE_P(stat) != IS_BOOL || !Z_BVAL_P(stat)) {
+	if (Z_TYPE_P(&stat) != IS_TRUE && Z_TYPE_P(&stat) != IS_FALSE) {
 		php_jam_original_error_cb(E_CORE_WARNING TSRMLS_CC, "Could not enable jam_files. %s is not a directory", JAM_FILES_G(storage_path));
 		retval = 0;
 	}
-	zval_dtor(stat);
-	FREE_ZVAL(stat);
+	zval_dtor(&stat);
 	
 	return retval;
 }

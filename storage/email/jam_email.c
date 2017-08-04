@@ -46,7 +46,6 @@ PHP_JAM_STORE_FUNC(email)
 	/*
 		Error body
 	*/
-	//MAKE_STD_ZVAL(argies[2]);
 #if ZEND_MODULE_API_NO <= PHP_5_3_X_API_NO
 	php_start_ob_buffer(NULL, 4096, 0 TSRMLS_CC);
 #else
@@ -59,8 +58,7 @@ PHP_JAM_STORE_FUNC(email)
 #else
 	if (php_output_get_contents(&argies[2] TSRMLS_CC) == FAILURE) {
 #endif
-		//zval_dtor(argies[2]);
-		//FREE_ZVAL(argies[2]);
+		zval_dtor(&argies[2]);
 		
 #if ZEND_MODULE_API_NO <= PHP_5_3_X_API_NO
 		php_end_ob_buffer(0, 0 TSRMLS_CC);
@@ -76,22 +74,17 @@ PHP_JAM_STORE_FUNC(email)
 		php_output_end();
 #endif
 
-	//MAKE_STD_ZVAL(fname);
 	ZVAL_STRING(&fname, "mail");
 
 	/*
 		Recipient
 	*/
-	//MAKE_STD_ZVAL(argies[0]);
 	ZVAL_STRING(&argies[0], JAM_EMAIL_G(to_address));
-	//ZVAL_COPY_VALUE(&argies[0], &JAM_EMAIL_G(to_address));
 
 	/*
 		Subject
 	*/
-	//MAKE_STD_ZVAL(argies[1]);
 
-	//if (zend_hash_find(Z_ARRVAL_P(event), "error_message", sizeof("error_message"), (void **) &ppzval) == SUCCESS) {
 	if ((ppzval = zend_hash_str_find(Z_ARRVAL_P(event), "error_message", sizeof("error_message")-1)) != NULL) {
 		ZVAL_STRING(&argies[1], Z_STRVAL_P(ppzval));
 		//ZVAL_COPY_VALUE(&argies[1], Z_STRVAL_P(ppzval));
@@ -99,23 +92,17 @@ PHP_JAM_STORE_FUNC(email)
 		ZVAL_STRING(&argies[1], "Aware: No error message");
 	}
 
-	//MAKE_STD_ZVAL(retval);
 	call_user_function(EG(function_table), NULL, &fname, &retval, 3, argies);
 
 	zval_dtor(&fname);
-	//FREE_ZVAL(&fname);
 
 	zval_dtor(&retval);
-	//FREE_ZVAL(&retval);
 
 	zval_dtor(&argies[0]);
-	//FREE_ZVAL(&argies[0]);
 
 	zval_dtor(&argies[1]);
-	//FREE_ZVAL(&argies[1]);
 
 	zval_dtor(&argies[2]);
-	//FREE_ZVAL(&argies[2]);
 	
 	return AwareOperationSuccess;
 }

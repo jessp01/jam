@@ -189,7 +189,7 @@ PHP_FUNCTION(jam_set_error_handler)
 			/* Create a new handler */
 			zend_ptr_stack_push(&JAM_G(user_error_handlers), tmp);
 
-			zval_dtor_ptr(EG(user_error_handler));
+			zval_dtor(&EG(user_error_handler));
 			ZVAL_STRING(&EG(user_error_handler), "__jam_error_handler_callback");
 
 		} else {
@@ -252,6 +252,7 @@ static void _add_assoc_zval_helper(zval *event, char *name, uint name_len TSRMLS
 void php_jam_capture_error_ex(int type, const char *error_filename, const uint error_lineno, zend_bool free_event, const char *format, va_list args TSRMLS_DC)
 {
 	zval *event,*ppzval=NULL;
+	event = ecalloc(sizeof(zval), 1);
 	array_init(event);
 	va_list args_cp;
 	int len;
@@ -298,6 +299,8 @@ void php_jam_capture_error_ex(int type, const char *error_filename, const uint e
 	/* Capture backtrace */
 	if (JAM_G(log_backtrace)) {
 		zval *btrace;
+		btrace = ecalloc(sizeof(zval), 1);
+		array_init(btrace);
 		//ALLOC_INIT_ZVAL(btrace);
 #if PHP_API_VERSION <= PHP_5_3_X_API_NO
 		zend_fetch_debug_backtrace(btrace, 0, 0 );
@@ -335,20 +338,21 @@ void php_jam_capture_error_ex(int type, const char *error_filename, const uint e
 	php_jam_storage_store_all(uuid_str, event, type, error_filename, error_lineno );
 	
 	if (free_event) {
-		zval_ptr_dtor(event);
-		//zval_dtor(event);
+		//zval_ptr_dtor(event);
+		zval_dtor(event);
 		//FREE_ZVAL(event);
 	}
 }
 
 static void php_jam_user_event_trigger(int type TSRMLS_DC, const char *error_filename, const uint error_lineno, const char *format, ...)
 {
-	//zval *event;
+	zval *event;
 	va_list args;
 
-	//array_init(event);
+	event = ecalloc(sizeof(zval), 1);
+	array_init(event);
 	
-	//add_assoc_bool_ex(event, "jam_event_trigger", sizeof("jam_event_trigger") - 1, 0);
+	add_assoc_bool(event, "jam_event_trigger", 1);
 	
 	va_start(args, format);
 	php_jam_capture_error_ex(type, error_filename, error_lineno, 1, format, args );
@@ -357,10 +361,11 @@ static void php_jam_user_event_trigger(int type TSRMLS_DC, const char *error_fil
 
 void php_jam_invoke_handler(int type TSRMLS_DC, const char *error_filename, const uint error_lineno, const char *format, ...)
 {
-	//zval *event;
+	zval *event;
 	va_list args;
 
-	//array_init(event);
+	event = ecalloc(sizeof(zval), 1);
+	array_init(event);
 	
 	va_start(args, format);
 	php_jam_capture_error_ex(type, error_filename, error_lineno, 1, format, args );
@@ -395,8 +400,9 @@ void php_jam_capture_error(int type, const char *error_filename, const uint erro
 	}
 	
 	if (type & JAM_G(log_level)) {
-		//zval *event;
-		//array_init(event);
+		zval *event;
+		event = ecalloc(sizeof(zval), 1);
+		array_init(event);
 
 		php_jam_capture_error_ex(type, error_filename, error_lineno, 1, format, args );
 		JAM_G(orig_error_cb)(type, error_filename, error_lineno, format, args);
@@ -531,9 +537,9 @@ static int php_jam_long_dtor(void **datas TSRMLS_DC)
 {
 	long *st = *datas;
 	
-	if (st) {
-		free(st);
-	}
+	//if (st) {
+	//	free(st);
+	//}
 	return ZEND_HASH_APPLY_REMOVE;
 }
 

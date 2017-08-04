@@ -47,19 +47,18 @@
 */
 static void php_jam_capture_slow_request(long elapsed, long threshold, double u_time, double s_time, const char *format, ...)
 {
-	va_list args;
-	zval *event, *slow_request;
+	//TODO: REIMPLEMENT!
+	/*va_list args;
+	zval *slow_request;
 	
-	//ALLOC_INIT_ZVAL(event);
 	//array_init(event);
 	
-	//ALLOC_INIT_ZVAL(slow_request);
 	array_init(slow_request);
 	
 	add_assoc_long(slow_request, "time_elapsed", elapsed);
 	add_assoc_long(slow_request, "slow_request_threshold", threshold);	
 	
-	/* Info about where the time is spent, TODO: check WIN32 */
+	// Info about where the time is spent, TODO: check WIN32 
 	add_assoc_double(slow_request, "rusage_user_time", u_time);
 	add_assoc_double(slow_request, "rusage_system_time", s_time);
 	
@@ -68,7 +67,7 @@ static void php_jam_capture_slow_request(long elapsed, long threshold, double u_
 
 	va_start(args, format);
 	php_jam_capture_error_ex(E_CORE_WARNING, "jam internal report", 0, 1, format, args);
-	va_end(args);
+	va_end(args);*/
 }
 /* }}} */
 
@@ -121,14 +120,15 @@ void php_jam_monitor_slow_request(struct timeval *request_start, struct rusage *
 */
 static void php_jam_capture_memory_usage(long peak, long threshold, const char *format, ...)
 {
-	va_list args;
-	zval *event, *peak_usage;
+	// TODO: reimplement
+	/*va_list args;
+	//zval *event, *peak_usage;
 	
 	//ALLOC_INIT_ZVAL(event);
-	array_init(event);
+	//array_init(event);
 	
 	//ALLOC_INIT_ZVAL(peak_usage);
-	array_init(peak_usage);
+	//array_init(peak_usage);
 
 	add_assoc_long(peak_usage, "memory_peak_usage", peak);
 	add_assoc_long(peak_usage, "memory_usage_threshold", threshold);	
@@ -138,7 +138,7 @@ static void php_jam_capture_memory_usage(long peak, long threshold, const char *
 
 	va_start(args, format);
 	php_jam_capture_error_ex(E_CORE_WARNING, "jam internal report", 0, 1, format, args);
-	va_end(args);
+	va_end(args);*/
 }
 /* }}} */
 

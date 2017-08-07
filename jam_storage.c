@@ -189,7 +189,6 @@ void php_jam_storage_store(php_jam_storage_module *mod, const char *uuid, zval *
 				return;
 			}
 		}
-		//zval_dtor(level);
 	}
 	
 	/* Connect failed, report error and bail out */

@@ -158,7 +158,10 @@ PHP_FUNCTION(jam_set_error_handler)
 		JAM_G(orig_set_error_handler)(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
 		/* Take the user error handler and push to our stack */
-		if (Z_TYPE(EG(user_error_handler)) != IS_UNDEF){
+		int type = Z_TYPE(EG(user_error_handler));
+		zval shit = EG(user_error_handler);
+		char *shit_string = Z_STRVAL(EG(user_error_handler));
+		if (Z_TYPE(EG(user_error_handler)) == IS_STRING){
 			zval *tmp;
 			
 			/* Override the error handler with our callback */
@@ -170,16 +173,20 @@ PHP_FUNCTION(jam_set_error_handler)
 				zval *old_handler = (zval *)zend_ptr_stack_pop(&JAM_G(user_error_handlers));
 				zend_ptr_stack_push(&JAM_G(user_error_handlers), old_handler);
 			
-				zval_dtor(return_value);
 				ZVAL_STRING(return_value, Z_STRVAL_P(old_handler));
+				zval_dtor(return_value);
 			}
 			
 			//ALLOC_INIT_ZVAL(tmp);
+			//array_init(tmp);
+
+
+
 			ZVAL_STRING(tmp, Z_STRVAL(EG(user_error_handler)));
 
 			/* free previous error handler */
 			if (JAM_G(user_error_handler)) {
-				//zval_ptr_dtor(JAM_G(user_error_handler));
+				zval_dtor(JAM_G(user_error_handler));
 				//FREE_ZVAL(JAM_G(user_error_handler));
 			}
 			
@@ -193,7 +200,7 @@ PHP_FUNCTION(jam_set_error_handler)
 			ZVAL_STRING(&EG(user_error_handler), "__jam_error_handler_callback");
 
 		} else {
-			zval_ptr_dtor(JAM_G(user_error_handler));
+			//zval_dtor(JAM_G(user_error_handler));
 			//FREE_ZVAL(JAM_G(user_error_handler));
 			JAM_G(user_error_handler) = NULL;
 		}
@@ -338,8 +345,8 @@ void php_jam_capture_error_ex(int type, const char *error_filename, const uint e
 	php_jam_storage_store_all(uuid_str, event, type, error_filename, error_lineno );
 	
 	if (free_event) {
-		//zval_ptr_dtor(event);
-		zval_dtor(event);
+		zval_ptr_dtor(event);
+		//zval_dtor(event);
 		//FREE_ZVAL(event);
 	}
 }
@@ -627,7 +634,7 @@ static void php_jam_restore_error_handling(TSRMLS_D)
 	zend_ptr_stack_destroy(&JAM_G(user_error_handlers));
 	
 	if (JAM_G(user_error_handler)) {
-		//zval_dtor(JAM_G(user_error_handler));
+		zval_dtor(JAM_G(user_error_handler));
 		//zval_ptr_dtor(JAM_G(user_error_handler));
 		//FREE_ZVAL(JAM_G(user_error_handler));
 	}
